@@ -1,0 +1,27 @@
+node_modules
+.next
+.vercel
+dist
+out
+
+# Local secrets — never commit these. Use `.env.example` as the template.
+.env
+.env.local
+.env.*.local
+
+.DS_Store
+.turbo
+
+# Local database — binary, regenerated on each clone via `npm run setup`.
+# The reproducible content lives in `lib/db/snapshot.json` instead.
+.pglite
+.pglite-test
+
+# Node logs / build artefacts (`*.log` covers .build.log, .pgpush.log, .start.log)
+*.log
+coverage
+*.tsbuildinfo
+.drizzle
+
+# NOTE: `.uploads/` is intentionally NOT ignored — committing it preserves
+# finding photos and other user attachments alongside the data snapshot.

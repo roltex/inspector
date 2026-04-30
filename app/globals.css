@@ -1,0 +1,113 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    /* Safety emerald */
+    --primary: 160 84% 35%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+
+    --accent: 160 70% 94%;
+    --accent-foreground: 160 84% 18%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 160 84% 35%;
+
+    --radius: 0.85rem;
+  }
+
+  .dark {
+    --background: 222 47% 6%;
+    --foreground: 210 20% 98%;
+
+    --card: 222 47% 8%;
+    --card-foreground: 210 20% 98%;
+
+    --popover: 222 47% 8%;
+    --popover-foreground: 210 20% 98%;
+
+    --primary: 160 70% 45%;
+    --primary-foreground: 222 47% 6%;
+
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 20% 98%;
+
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 160 50% 18%;
+    --accent-foreground: 160 80% 85%;
+
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 210 20% 98%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 222 47% 6%;
+
+    --success: 142 71% 45%;
+    --success-foreground: 222 47% 6%;
+
+    --border: 217 33% 18%;
+    --input: 217 33% 18%;
+    --ring: 160 70% 45%;
+  }
+
+  * {
+    @apply border-border;
+  }
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+}
+
+@layer utilities {
+  .mesh-bg {
+    background-image:
+      radial-gradient(at 20% 10%, hsl(var(--primary) / 0.18) 0, transparent 50%),
+      radial-gradient(at 80% 0%, hsl(200 90% 60% / 0.15) 0, transparent 50%),
+      radial-gradient(at 50% 100%, hsl(160 84% 60% / 0.15) 0, transparent 50%);
+  }
+  .glass {
+    @apply bg-background/60 backdrop-blur-xl border border-border/60;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .safe-bottom {
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.5rem);
+  }
+}
