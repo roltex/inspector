@@ -11,6 +11,8 @@ const optStr = (max = 200) =>
 export const companyCreateSchema = z.object({
   name: z.string().min(2).max(200),
   code: optStr(50),
+  /** Optional FK into `risk_sector`. NULL / "" ⇒ unclassified. */
+  riskSectorId: optStr(32),
   contactName: optStr(200),
   contactEmail: z
     .string()

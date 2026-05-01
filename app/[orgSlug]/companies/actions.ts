@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { and, eq } from "drizzle-orm";
 import { requirePermission, requireMembership } from "@/lib/auth/session";
 import { db } from "@/lib/db/client";
-import { company, companyObject } from "@/lib/db/schema";
+import { company, companyObject, riskSector } from "@/lib/db/schema";
 import { createId } from "@/lib/db/ids";
 import {
   companyCreateSchema,
@@ -14,6 +14,22 @@ import {
   companyObjectUpdateSchema,
 } from "@/lib/validators/companies";
 
+/**
+ * Validate that a given risk-sector id belongs to the caller's organization.
+ * Returns the sector's id (echo) or throws — protects against tampered
+ * client payloads that reference another tenant's sector.
+ */
+async function assertOwnedRiskSector(orgId: string, id: string | null | undefined) {
+  if (!id) return null;
+  const [row] = await db
+    .select({ id: riskSector.id })
+    .from(riskSector)
+    .where(and(eq(riskSector.id, id), eq(riskSector.organizationId, orgId)))
+    .limit(1);
+  if (!row) throw new Error("Risk sector not found in this workspace");
+  return row.id;
+}
+
 /* -------------------------------------------------------------------------- */
 /*  Companies                                                                 */
 /* -------------------------------------------------------------------------- */
@@ -21,12 +37,17 @@ import {
 export async function createCompany(orgSlug: string, input: unknown) {
   const m = await requirePermission(orgSlug, "companies:manage");
   const data = companyCreateSchema.parse(input);
+  const riskSectorId = await assertOwnedRiskSector(
+    m.organization.id,
+    data.riskSectorId,
+  );
   const id = createId("co");
   await db.insert(company).values({
     id,
     organizationId: m.organization.id,
     name: data.name,
     code: data.code,
+    riskSectorId,
     contactName: data.contactName,
     contactEmail: data.contactEmail,
     contactPhone: data.contactPhone,
@@ -42,9 +63,32 @@ export async function createCompany(orgSlug: string, input: unknown) {
 export async function updateCompany(orgSlug: string, id: string, input: unknown) {
   const m = await requirePermission(orgSlug, "companies:manage");
   const data = companyUpdateSchema.parse(input);
+  // Resolve the sector id before building the patch so invalid values fail
+  // loudly before we touch the DB.
+  const patch: Record<string, unknown> = { updatedAt: new Date() };
+  for (const k of [
+    "name",
+    "code",
+    "contactName",
+    "contactEmail",
+    "contactPhone",
+    "address",
+    "notes",
+    "isActive",
+  ] as const) {
+    const v = (data as Record<string, unknown>)[k];
+    if (v !== undefined) patch[k] = v;
+  }
+  if (data.riskSectorId !== undefined) {
+    patch.riskSectorId = await assertOwnedRiskSector(
+      m.organization.id,
+      data.riskSectorId,
+    );
+  }
+
   await db
     .update(company)
-    .set({ ...data, updatedAt: new Date() })
+    .set(patch)
     .where(and(eq(company.id, id), eq(company.organizationId, m.organization.id)));
   revalidatePath(`/${orgSlug}/companies`);
   revalidatePath(`/${orgSlug}/companies/${id}`);

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-04-30T11:48:51.547Z",
+  "generatedAt": "2026-05-01T10:49:43.792Z",
   "tables": {
     "account": [
       {
@@ -344,7 +344,8 @@
         "is_active": true,
         "created_by_id": "jE1XbuSmwQSixHknchbUQ",
         "created_at": "2026-04-25T12:22:25.556Z",
-        "updated_at": "2026-04-25T12:22:25.556Z"
+        "updated_at": "2026-04-25T12:22:25.556Z",
+        "risk_sector_id": null
       },
       {
         "id": "co_0yeycdk44e3vsv",
@@ -359,7 +360,24 @@
         "is_active": true,
         "created_by_id": "jE1XbuSmwQSixHknchbUQ",
         "created_at": "2026-04-25T15:26:12.043Z",
-        "updated_at": "2026-04-25T15:26:12.043Z"
+        "updated_at": "2026-04-25T15:26:12.043Z",
+        "risk_sector_id": null
+      },
+      {
+        "id": "co_qxpxayfq606btp",
+        "organization_id": "audmb3AC6uG6HGm0SHQCD",
+        "name": "BSC",
+        "code": "0202020",
+        "contact_name": "Aleksandre",
+        "contact_email": "info@bsc.ge",
+        "contact_phone": "123123123",
+        "address": "asdasdasda",
+        "notes": "sadasdasd",
+        "is_active": true,
+        "created_by_id": "jE1XbuSmwQSixHknchbUQ",
+        "created_at": "2026-05-01T09:53:04.308Z",
+        "updated_at": "2026-05-01T09:53:04.308Z",
+        "risk_sector_id": null
       }
     ],
     "company_object": [
@@ -419,6 +437,25 @@
         "created_by_id": "jE1XbuSmwQSixHknchbUQ",
         "created_at": "2026-04-25T15:27:37.255Z",
         "updated_at": "2026-04-25T15:27:37.255Z"
+      },
+      {
+        "id": "obj_bnlgrt36bspfj9",
+        "organization_id": "audmb3AC6uG6HGm0SHQCD",
+        "company_id": "co_qxpxayfq606btp",
+        "name": "BSC Head Office",
+        "code": "123456",
+        "type": "Branch",
+        "address": "adasdasd",
+        "city": "Tbilisi",
+        "country": "Georgia",
+        "manager_name": "Sandro",
+        "manager_email": "info@bsc.ge",
+        "manager_phone": "+9955454512",
+        "notes": "asdasdad",
+        "is_active": true,
+        "created_by_id": "jE1XbuSmwQSixHknchbUQ",
+        "created_at": "2026-05-01T09:54:18.873Z",
+        "updated_at": "2026-05-01T09:54:18.873Z"
       }
     ],
     "contractor": [],
@@ -694,20 +731,7 @@
     ],
     "inspection_item": [
       {
-        "id": "ii_8wch6im8q8kz79",
-        "organization_id": "audmb3AC6uG6HGm0SHQCD",
-        "name": "დაბალი/საშუალო რისკის სექტორი (template)",
-        "description": null,
-        "category": "რისკების შეფასება",
-        "sort_order": 0,
-        "is_active": true,
-        "created_by_id": "jE1XbuSmwQSixHknchbUQ",
-        "created_at": "2026-04-25T20:00:19.143Z",
-        "updated_at": "2026-04-25T20:00:19.143Z",
-        "category_id": "iic_c1033cd8acdf9577_06778bb6"
-      },
-      {
-        "id": "ii_4d4y0a2vf1fyfq",
+        "id": "ii_lzdz079h2ckpra",
         "organization_id": "audmb3AC6uG6HGm0SHQCD",
         "name": "აირ-ჭრის / შედუღების აპარატის უსაფრთხოების ინსპექტირებისა და ტექნიკური გამართულობის აქტი (template)",
         "description": null,
@@ -715,9 +739,22 @@
         "sort_order": 0,
         "is_active": true,
         "created_by_id": "jE1XbuSmwQSixHknchbUQ",
-        "created_at": "2026-04-25T20:00:28.614Z",
-        "updated_at": "2026-04-25T20:00:28.614Z",
+        "created_at": "2026-05-01T09:58:50.087Z",
+        "updated_at": "2026-05-01T09:58:50.087Z",
         "category_id": "iic_cwqj7lnvkvpz9g"
+      },
+      {
+        "id": "ii_i1yzodybztckgv",
+        "organization_id": "audmb3AC6uG6HGm0SHQCD",
+        "name": "დაბალი/საშუალო რისკის სექტორი (template)",
+        "description": null,
+        "category": "რისკების შეფასება",
+        "sort_order": 0,
+        "is_active": true,
+        "created_by_id": "jE1XbuSmwQSixHknchbUQ",
+        "created_at": "2026-05-01T09:58:58.771Z",
+        "updated_at": "2026-05-01T09:58:58.771Z",
+        "category_id": "iic_c1033cd8acdf9577_06778bb6"
       }
     ],
     "inspection_item_category": [
@@ -760,9 +797,265 @@
     ],
     "inspection_item_field": [
       {
-        "id": "iif_qk9hoqhq2fr3rc",
+        "id": "iif_y8gheaijfkv8hd",
         "organization_id": "audmb3AC6uG6HGm0SHQCD",
-        "inspection_item_id": "ii_8wch6im8q8kz79",
+        "inspection_item_id": "ii_i1yzodybztckgv",
+        "key": "deadline",
+        "label": "შესრულებაზე პასუხისმგებელი პირი / ვადა",
+        "type": "date",
+        "options": null,
+        "required": false,
+        "placeholder": null,
+        "help_text": null,
+        "sort_order": 9,
+        "created_by_id": "jE1XbuSmwQSixHknchbUQ",
+        "created_at": "2026-05-01T09:58:58.811Z",
+        "updated_at": "2026-05-01T09:58:58.811Z",
+        "sub_fields": null,
+        "preset_rows": null
+      },
+      {
+        "id": "iif_r3u3mq7so3lvx8",
+        "organization_id": "audmb3AC6uG6HGm0SHQCD",
+        "inspection_item_id": "ii_i1yzodybztckgv",
+        "key": "audit_date",
+        "label": "გადახედვის სავარაუდო თარიღი",
+        "type": "date",
+        "options": null,
+        "required": false,
+        "placeholder": null,
+        "help_text": null,
+        "sort_order": 10,
+        "created_by_id": "jE1XbuSmwQSixHknchbUQ",
+        "created_at": "2026-05-01T09:58:58.816Z",
+        "updated_at": "2026-05-01T09:58:58.816Z",
+        "sub_fields": null,
+        "preset_rows": null
+      },
+      {
+        "id": "iif_h4mpaak09wb1j3",
+        "organization_id": "audmb3AC6uG6HGm0SHQCD",
+        "inspection_item_id": "ii_lzdz079h2ckpra",
+        "key": "items",
+        "label": "პუნქტები",
+        "type": "table",
+        "options": null,
+        "required": false,
+        "placeholder": null,
+        "help_text": null,
+        "sort_order": 0,
+        "created_by_id": "jE1XbuSmwQSixHknchbUQ",
+        "created_at": "2026-05-01T09:58:50.097Z",
+        "updated_at": "2026-05-01T09:58:50.097Z",
+        "sub_fields": [
+          {
+            "key": "photo",
+            "type": "photo",
+            "label": "ფოტო",
+            "options": null,
+            "helpText": null,
+            "required": false,
+            "placeholder": null
+          },
+          {
+            "key": "items",
+            "type": "text",
+            "label": "პუნქტები",
+            "options": null,
+            "helpText": null,
+            "required": false,
+            "placeholder": null
+          },
+          {
+            "key": "status",
+            "type": "radio",
+            "label": "სტატუსი",
+            "options": [
+              {
+                "label": "აქვს",
+                "value": "yes"
+              },
+              {
+                "label": "არ აქვს",
+                "value": "no"
+              }
+            ],
+            "helpText": null,
+            "required": false,
+            "placeholder": null
+          },
+          {
+            "key": "comment",
+            "type": "textarea",
+            "label": "კომენტარი",
+            "options": null,
+            "helpText": null,
+            "required": false,
+            "placeholder": null
+          }
+        ],
+        "preset_rows": [
+          {
+            "items": "ბალონები დაფიქსირებულია ვერტიკალურ მდგომარეობაში სპეციალური ჯაჭვით ან მომჭერით"
+          },
+          {
+            "items": "ბალონები შეღებილია შესაბამის ფერებში და აწერია აირის დასახელება (ჟანგბადი, აცეტილენი/პროპანი)"
+          },
+          {
+            "items": "ბალონებს,რომლებიც არ გამოიყენება, დახრახნილი აქვს დამცავი ხუფები (ვენტილების დასაცავად)"
+          }
+        ]
+      },
+      {
+        "id": "iif_j9wo7bdvnt9quc",
+        "organization_id": "audmb3AC6uG6HGm0SHQCD",
+        "inspection_item_id": "ii_lzdz079h2ckpra",
+        "key": "final_status",
+        "label": "საბოლოო სტატუსი",
+        "type": "radio",
+        "options": [
+          {
+            "label": "სრულად შეესაბამება მოთხოვრებს",
+            "value": "good"
+          },
+          {
+            "label": "საჭიროებს გამოსწორებას",
+            "value": "needsapprovement"
+          },
+          {
+            "label": "არ შეესაბამება მოთხოვრებს",
+            "value": "bad"
+          }
+        ],
+        "required": true,
+        "placeholder": null,
+        "help_text": null,
+        "sort_order": 1,
+        "created_by_id": "jE1XbuSmwQSixHknchbUQ",
+        "created_at": "2026-05-01T09:58:50.123Z",
+        "updated_at": "2026-05-01T09:58:50.123Z",
+        "sub_fields": null,
+        "preset_rows": null
+      },
+      {
+        "id": "iif_s63finbjkofwbk",
+        "organization_id": "audmb3AC6uG6HGm0SHQCD",
+        "inspection_item_id": "ii_i1yzodybztckgv",
+        "key": "identifying_threats",
+        "label": "საფრთხეთა იდენტიფიცირება",
+        "type": "select",
+        "options": [
+          {
+            "label": "ბასრი საგნები",
+            "value": "sharpObjects"
+          },
+          {
+            "label": "ცხელი ზედაპირები",
+            "value": "hotSurfaces"
+          },
+          {
+            "label": "კიბიდან ვარდნა",
+            "value": "fallFromLadder"
+          },
+          {
+            "label": "ვარდნა/ჩახერგილი სამოძრაო გზები",
+            "value": "fallOrBlockedPathways"
+          },
+          {
+            "label": "მონიტორიანი დანადგარები/ერგონომიკა",
+            "value": "machineryWithMonitorsErgonomics"
+          },
+          {
+            "label": "არასაკმარისი ვენტილაცია",
+            "value": "insufficientVentilation"
+          },
+          {
+            "label": "ნივთების ცვენა",
+            "value": "fallingObjects"
+          },
+          {
+            "label": "ხანძარსაწინააღმდეგო სისტემის/აღჭურვილობის გაუმართაობა",
+            "value": "faultyFireSafetySystemOrEquipment"
+          },
+          {
+            "label": "ქიმიკატების განთავსების წესების დარღვევა",
+            "value": "chemicalStorageViolation"
+          },
+          {
+            "label": "ნარჩენების განთავსების წესების დარღვევა",
+            "value": "wasteDisposalViolation"
+          },
+          {
+            "label": "ელექტროობა - ელ.კარადა, დაზიანებული/ღია ელ.სადენები",
+            "value": "electricityElectricalCabinetDamagedOrOpenWires"
+          },
+          {
+            "label": "პორტატული გენერატორი",
+            "value": "portableGenerator"
+          },
+          {
+            "label": "ტვირთის ხელით უსაფრთხოდ გადატანის წესების დარღვევა",
+            "value": "manualHandlingSafetyViolation"
+          },
+          {
+            "label": "გაუმართავი/არაქარხნული ტექ. აღჭურვილობა",
+            "value": "faultyOrNonFactoryTechnicalEquipment"
+          },
+          {
+            "label": "უსაფრთხოების ნიშნების გამოყენების წესის დარღვევა",
+            "value": "safetySignUsageViolation"
+          }
+        ],
+        "required": true,
+        "placeholder": null,
+        "help_text": null,
+        "sort_order": 0,
+        "created_by_id": "jE1XbuSmwQSixHknchbUQ",
+        "created_at": "2026-05-01T09:58:58.775Z",
+        "updated_at": "2026-05-01T09:58:58.775Z",
+        "sub_fields": null,
+        "preset_rows": null
+      },
+      {
+        "id": "iif_gwzxyriep96c42",
+        "organization_id": "audmb3AC6uG6HGm0SHQCD",
+        "inspection_item_id": "ii_i1yzodybztckgv",
+        "key": "attachments",
+        "label": "ამსახველი ფოტო/ვიდეო მასალა",
+        "type": "photo",
+        "options": null,
+        "required": false,
+        "placeholder": null,
+        "help_text": null,
+        "sort_order": 1,
+        "created_by_id": "jE1XbuSmwQSixHknchbUQ",
+        "created_at": "2026-05-01T09:58:58.780Z",
+        "updated_at": "2026-05-01T09:58:58.780Z",
+        "sub_fields": null,
+        "preset_rows": null
+      },
+      {
+        "id": "iif_2q113ov8vlsjh4",
+        "organization_id": "audmb3AC6uG6HGm0SHQCD",
+        "inspection_item_id": "ii_i1yzodybztckgv",
+        "key": "circle",
+        "label": "პირთა წრე",
+        "type": "number",
+        "options": null,
+        "required": false,
+        "placeholder": null,
+        "help_text": null,
+        "sort_order": 2,
+        "created_by_id": "jE1XbuSmwQSixHknchbUQ",
+        "created_at": "2026-05-01T09:58:58.783Z",
+        "updated_at": "2026-05-01T09:58:58.783Z",
+        "sub_fields": null,
+        "preset_rows": null
+      },
+      {
+        "id": "iif_st119f6e3igic5",
+        "organization_id": "audmb3AC6uG6HGm0SHQCD",
+        "inspection_item_id": "ii_i1yzodybztckgv",
         "key": "type",
         "label": "დაშავების / დაზიანების ტიპ",
         "type": "select",
@@ -881,15 +1174,15 @@
         "help_text": null,
         "sort_order": 3,
         "created_by_id": "jE1XbuSmwQSixHknchbUQ",
-        "created_at": "2026-04-25T20:00:19.154Z",
-        "updated_at": "2026-04-25T20:00:19.154Z",
+        "created_at": "2026-05-01T09:58:58.789Z",
+        "updated_at": "2026-05-01T09:58:58.789Z",
         "sub_fields": null,
         "preset_rows": null
       },
       {
-        "id": "iif_e4vfgc10amq7j2",
+        "id": "iif_mzwpfk9cb6e9l5",
         "organization_id": "audmb3AC6uG6HGm0SHQCD",
-        "inspection_item_id": "ii_8wch6im8q8kz79",
+        "inspection_item_id": "ii_i1yzodybztckgv",
         "key": "control",
         "label": "არსებული კონტროლის ზომები",
         "type": "textarea",
@@ -899,15 +1192,15 @@
         "help_text": null,
         "sort_order": 4,
         "created_by_id": "jE1XbuSmwQSixHknchbUQ",
-        "created_at": "2026-04-25T20:00:19.158Z",
-        "updated_at": "2026-04-25T20:00:19.158Z",
+        "created_at": "2026-05-01T09:58:58.794Z",
+        "updated_at": "2026-05-01T09:58:58.794Z",
         "sub_fields": null,
         "preset_rows": null
       },
       {
-        "id": "iif_6hxd837ls6hzc8",
+        "id": "iif_okpb7q894ijhof",
         "organization_id": "audmb3AC6uG6HGm0SHQCD",
-        "inspection_item_id": "ii_8wch6im8q8kz79",
+        "inspection_item_id": "ii_i1yzodybztckgv",
         "key": "risk",
         "label": "საწყისი რისკი",
         "type": "text",
@@ -917,15 +1210,15 @@
         "help_text": null,
         "sort_order": 5,
         "created_by_id": "jE1XbuSmwQSixHknchbUQ",
-        "created_at": "2026-04-25T20:00:19.161Z",
-        "updated_at": "2026-04-25T20:00:19.161Z",
+        "created_at": "2026-05-01T09:58:58.797Z",
+        "updated_at": "2026-05-01T09:58:58.797Z",
         "sub_fields": null,
         "preset_rows": null
       },
       {
-        "id": "iif_abdyoufmi9fuhb",
+        "id": "iif_fggqkd7f703ns3",
         "organization_id": "audmb3AC6uG6HGm0SHQCD",
-        "inspection_item_id": "ii_8wch6im8q8kz79",
+        "inspection_item_id": "ii_i1yzodybztckgv",
         "key": "aditional",
         "label": "დამატებითი კონტროლის ზომები",
         "type": "textarea",
@@ -935,15 +1228,15 @@
         "help_text": null,
         "sort_order": 6,
         "created_by_id": "jE1XbuSmwQSixHknchbUQ",
-        "created_at": "2026-04-25T20:00:19.164Z",
-        "updated_at": "2026-04-25T20:00:19.164Z",
+        "created_at": "2026-05-01T09:58:58.800Z",
+        "updated_at": "2026-05-01T09:58:58.800Z",
         "sub_fields": null,
         "preset_rows": null
       },
       {
-        "id": "iif_ep1cxezgs5q1i8",
+        "id": "iif_vkmlbzoxzq93eu",
         "organization_id": "audmb3AC6uG6HGm0SHQCD",
-        "inspection_item_id": "ii_8wch6im8q8kz79",
+        "inspection_item_id": "ii_i1yzodybztckgv",
         "key": "left_risk",
         "label": "დარჩენილი რისკი",
         "type": "text",
@@ -953,15 +1246,15 @@
         "help_text": null,
         "sort_order": 7,
         "created_by_id": "jE1XbuSmwQSixHknchbUQ",
-        "created_at": "2026-04-25T20:00:19.166Z",
-        "updated_at": "2026-04-25T20:00:19.166Z",
+        "created_at": "2026-05-01T09:58:58.803Z",
+        "updated_at": "2026-05-01T09:58:58.803Z",
         "sub_fields": null,
         "preset_rows": null
       },
       {
-        "id": "iif_zsjb4vt2axvygl",
+        "id": "iif_sslzfzpa29swhk",
         "organization_id": "audmb3AC6uG6HGm0SHQCD",
-        "inspection_item_id": "ii_8wch6im8q8kz79",
+        "inspection_item_id": "ii_i1yzodybztckgv",
         "key": "reaction",
         "label": "გასატარებელი ზომები / რეაგირება",
         "type": "textarea",
@@ -971,264 +1264,8 @@
         "help_text": null,
         "sort_order": 8,
         "created_by_id": "jE1XbuSmwQSixHknchbUQ",
-        "created_at": "2026-04-25T20:00:19.168Z",
-        "updated_at": "2026-04-25T20:00:19.168Z",
-        "sub_fields": null,
-        "preset_rows": null
-      },
-      {
-        "id": "iif_5jfbh0neyb9l39",
-        "organization_id": "audmb3AC6uG6HGm0SHQCD",
-        "inspection_item_id": "ii_8wch6im8q8kz79",
-        "key": "deadline",
-        "label": "შესრულებაზე პასუხისმგებელი პირი / ვადა",
-        "type": "date",
-        "options": null,
-        "required": false,
-        "placeholder": null,
-        "help_text": null,
-        "sort_order": 9,
-        "created_by_id": "jE1XbuSmwQSixHknchbUQ",
-        "created_at": "2026-04-25T20:00:19.171Z",
-        "updated_at": "2026-04-25T20:00:19.171Z",
-        "sub_fields": null,
-        "preset_rows": null
-      },
-      {
-        "id": "iif_cf48e1a6n1eq3r",
-        "organization_id": "audmb3AC6uG6HGm0SHQCD",
-        "inspection_item_id": "ii_8wch6im8q8kz79",
-        "key": "audit_date",
-        "label": "გადახედვის სავარაუდო თარიღი",
-        "type": "date",
-        "options": null,
-        "required": false,
-        "placeholder": null,
-        "help_text": null,
-        "sort_order": 10,
-        "created_by_id": "jE1XbuSmwQSixHknchbUQ",
-        "created_at": "2026-04-25T20:00:19.173Z",
-        "updated_at": "2026-04-25T20:00:19.173Z",
-        "sub_fields": null,
-        "preset_rows": null
-      },
-      {
-        "id": "iif_hyl1235j16488l",
-        "organization_id": "audmb3AC6uG6HGm0SHQCD",
-        "inspection_item_id": "ii_4d4y0a2vf1fyfq",
-        "key": "items",
-        "label": "პუნქტები",
-        "type": "table",
-        "options": null,
-        "required": false,
-        "placeholder": null,
-        "help_text": null,
-        "sort_order": 0,
-        "created_by_id": "jE1XbuSmwQSixHknchbUQ",
-        "created_at": "2026-04-25T20:00:28.619Z",
-        "updated_at": "2026-04-25T20:00:28.619Z",
-        "sub_fields": [
-          {
-            "key": "photo",
-            "type": "photo",
-            "label": "ფოტო",
-            "options": null,
-            "helpText": null,
-            "required": false,
-            "placeholder": null
-          },
-          {
-            "key": "items",
-            "type": "text",
-            "label": "პუნქტები",
-            "options": null,
-            "helpText": null,
-            "required": false,
-            "placeholder": null
-          },
-          {
-            "key": "status",
-            "type": "radio",
-            "label": "სტატუსი",
-            "options": [
-              {
-                "label": "აქვს",
-                "value": "yes"
-              },
-              {
-                "label": "არ აქვს",
-                "value": "no"
-              }
-            ],
-            "helpText": null,
-            "required": false,
-            "placeholder": null
-          },
-          {
-            "key": "comment",
-            "type": "textarea",
-            "label": "კომენტარი",
-            "options": null,
-            "helpText": null,
-            "required": false,
-            "placeholder": null
-          }
-        ],
-        "preset_rows": [
-          {
-            "items": "ბალონები დაფიქსირებულია ვერტიკალურ მდგომარეობაში სპეციალური ჯაჭვით ან მომჭერით"
-          },
-          {
-            "items": "ბალონები შეღებილია შესაბამის ფერებში და აწერია აირის დასახელება (ჟანგბადი, აცეტილენი/პროპანი)"
-          },
-          {
-            "items": "ბალონებს,რომლებიც არ გამოიყენება, დახრახნილი აქვს დამცავი ხუფები (ვენტილების დასაცავად)"
-          }
-        ]
-      },
-      {
-        "id": "iif_2ucm6rtgv6dl45",
-        "organization_id": "audmb3AC6uG6HGm0SHQCD",
-        "inspection_item_id": "ii_4d4y0a2vf1fyfq",
-        "key": "final_status",
-        "label": "საბოლოო სტატუსი",
-        "type": "radio",
-        "options": [
-          {
-            "label": "სრულად შეესაბამება მოთხოვრებს",
-            "value": "good"
-          },
-          {
-            "label": "საჭიროებს გამოსწორებას",
-            "value": "needsapprovement"
-          },
-          {
-            "label": "არ შეესაბამება მოთხოვრებს",
-            "value": "bad"
-          }
-        ],
-        "required": true,
-        "placeholder": null,
-        "help_text": null,
-        "sort_order": 1,
-        "created_by_id": "jE1XbuSmwQSixHknchbUQ",
-        "created_at": "2026-04-25T20:00:28.623Z",
-        "updated_at": "2026-04-25T20:00:28.623Z",
-        "sub_fields": null,
-        "preset_rows": null
-      },
-      {
-        "id": "iif_y2jttqtn5lzfh0",
-        "organization_id": "audmb3AC6uG6HGm0SHQCD",
-        "inspection_item_id": "ii_8wch6im8q8kz79",
-        "key": "identifying_threats",
-        "label": "საფრთხეთა იდენტიფიცირება",
-        "type": "select",
-        "options": [
-          {
-            "label": "ბასრი საგნები",
-            "value": "sharpObjects"
-          },
-          {
-            "label": "ცხელი ზედაპირები",
-            "value": "hotSurfaces"
-          },
-          {
-            "label": "კიბიდან ვარდნა",
-            "value": "fallFromLadder"
-          },
-          {
-            "label": "ვარდნა/ჩახერგილი სამოძრაო გზები",
-            "value": "fallOrBlockedPathways"
-          },
-          {
-            "label": "მონიტორიანი დანადგარები/ერგონომიკა",
-            "value": "machineryWithMonitorsErgonomics"
-          },
-          {
-            "label": "არასაკმარისი ვენტილაცია",
-            "value": "insufficientVentilation"
-          },
-          {
-            "label": "ნივთების ცვენა",
-            "value": "fallingObjects"
-          },
-          {
-            "label": "ხანძარსაწინააღმდეგო სისტემის/აღჭურვილობის გაუმართაობა",
-            "value": "faultyFireSafetySystemOrEquipment"
-          },
-          {
-            "label": "ქიმიკატების განთავსების წესების დარღვევა",
-            "value": "chemicalStorageViolation"
-          },
-          {
-            "label": "ნარჩენების განთავსების წესების დარღვევა",
-            "value": "wasteDisposalViolation"
-          },
-          {
-            "label": "ელექტროობა - ელ.კარადა, დაზიანებული/ღია ელ.სადენები",
-            "value": "electricityElectricalCabinetDamagedOrOpenWires"
-          },
-          {
-            "label": "პორტატული გენერატორი",
-            "value": "portableGenerator"
-          },
-          {
-            "label": "ტვირთის ხელით უსაფრთხოდ გადატანის წესების დარღვევა",
-            "value": "manualHandlingSafetyViolation"
-          },
-          {
-            "label": "გაუმართავი/არაქარხნული ტექ. აღჭურვილობა",
-            "value": "faultyOrNonFactoryTechnicalEquipment"
-          },
-          {
-            "label": "უსაფრთხოების ნიშნების გამოყენების წესის დარღვევა",
-            "value": "safetySignUsageViolation"
-          }
-        ],
-        "required": true,
-        "placeholder": null,
-        "help_text": null,
-        "sort_order": 0,
-        "created_by_id": "jE1XbuSmwQSixHknchbUQ",
-        "created_at": "2026-04-25T20:00:19.145Z",
-        "updated_at": "2026-04-25T20:00:19.145Z",
-        "sub_fields": null,
-        "preset_rows": null
-      },
-      {
-        "id": "iif_84tarkstjkv2na",
-        "organization_id": "audmb3AC6uG6HGm0SHQCD",
-        "inspection_item_id": "ii_8wch6im8q8kz79",
-        "key": "attachments",
-        "label": "ამსახველი ფოტო/ვიდეო მასალა",
-        "type": "photo",
-        "options": null,
-        "required": false,
-        "placeholder": null,
-        "help_text": null,
-        "sort_order": 1,
-        "created_by_id": "jE1XbuSmwQSixHknchbUQ",
-        "created_at": "2026-04-25T20:00:19.148Z",
-        "updated_at": "2026-04-25T20:00:19.148Z",
-        "sub_fields": null,
-        "preset_rows": null
-      },
-      {
-        "id": "iif_crhq8mgw367fd2",
-        "organization_id": "audmb3AC6uG6HGm0SHQCD",
-        "inspection_item_id": "ii_8wch6im8q8kz79",
-        "key": "circle",
-        "label": "პირთა წრე",
-        "type": "number",
-        "options": null,
-        "required": false,
-        "placeholder": null,
-        "help_text": null,
-        "sort_order": 2,
-        "created_by_id": "jE1XbuSmwQSixHknchbUQ",
-        "created_at": "2026-04-25T20:00:19.151Z",
-        "updated_at": "2026-04-25T20:00:19.151Z",
+        "created_at": "2026-05-01T09:58:58.807Z",
+        "updated_at": "2026-05-01T09:58:58.807Z",
         "sub_fields": null,
         "preset_rows": null
       }
@@ -2431,6 +2468,7 @@
         "updated_at": "2026-04-25T08:03:33.368Z"
       }
     ],
+    "risk_sector": [],
     "site": [],
     "training_program": [],
     "user": [
@@ -2540,7 +2578,7 @@
         "image": null,
         "phone": null,
         "created_at": "2026-04-24T19:14:36.862Z",
-        "updated_at": "2026-04-25T14:26:08.753Z",
+        "updated_at": "2026-05-01T06:01:46.926Z",
         "super_admin": true,
         "banned_at": null,
         "ban_reason": null,

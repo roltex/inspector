@@ -3,6 +3,7 @@ import {
   ClipboardCheck,
   AlertTriangle,
   ShieldAlert,
+  ShieldHalf,
   ListTodo,
   Eye,
   GraduationCap,
@@ -60,6 +61,7 @@ export function buildNav(orgSlug: string): NavGroup[] {
       labelKey: "nav.directory",
       items: [
         { labelKey: "nav.companies", href: `${base}/companies`, icon: Building2 },
+        { labelKey: "nav.riskSectors", href: `${base}/risk-sectors`, icon: ShieldHalf },
         { labelKey: "nav.inspectionItems", href: `${base}/inspection-items`, icon: ListChecks },
       ],
     },

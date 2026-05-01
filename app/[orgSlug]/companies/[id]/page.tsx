@@ -4,13 +4,15 @@ import { and, asc, eq } from "drizzle-orm";
 import { ArrowLeft, Building2, MapPin, Mail, Phone } from "lucide-react";
 import { requireMembership } from "@/lib/auth/session";
 import { db } from "@/lib/db/client";
-import { company, companyObject } from "@/lib/db/schema";
+import { company, companyObject, riskSector } from "@/lib/db/schema";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page-header";
 import { can } from "@/lib/rbac/permissions";
 import { getT } from "@/lib/i18n";
+import type { RiskLevel } from "@/lib/validators/risk-sectors";
+import { RiskLevelBadge } from "../../risk-sectors/sector-badge";
 import { CreateObjectDialog } from "./create-object-dialog";
 import { CompanyDangerZone } from "./company-danger-zone";
 
@@ -25,12 +27,20 @@ export default async function CompanyDetailPage({
   const { t } = await getT();
   const canManage = can(m.role, "companies:manage");
 
-  const [row] = await db
-    .select()
+  const [joined] = await db
+    .select({
+      company,
+      sectorId: riskSector.id,
+      sectorName: riskSector.name,
+      sectorCode: riskSector.code,
+      sectorRisk: riskSector.defaultRisk,
+    })
     .from(company)
+    .leftJoin(riskSector, eq(riskSector.id, company.riskSectorId))
     .where(and(eq(company.id, params.id), eq(company.organizationId, m.organization.id)))
     .limit(1);
-  if (!row) notFound();
+  if (!joined) notFound();
+  const row = joined.company;
 
   const objects = await db
     .select()
@@ -56,6 +66,12 @@ export default async function CompanyDetailPage({
         description={row.code ? `${t("modules.companies.code")}: ${row.code}` : undefined}
         actions={
           <div className="flex flex-wrap items-center gap-2">
+            {joined.sectorId && joined.sectorRisk && (
+              <RiskLevelBadge
+                level={joined.sectorRisk as RiskLevel}
+                label={joined.sectorName ?? "—"}
+              />
+            )}
             {!row.isActive && <Badge variant="secondary">{t("common.inactive")}</Badge>}
             {canManage && (
               <CreateObjectDialog orgSlug={params.orgSlug} companyId={row.id} />

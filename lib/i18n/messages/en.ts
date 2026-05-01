@@ -76,6 +76,7 @@ export const enMessages = {
     insights: "Insights",
     directory: "Directory",
     companies: "Companies",
+    riskSectors: "Risk sectors",
     inspectionItems: "Inspection items",
   },
 
@@ -638,6 +639,10 @@ export const enMessages = {
       contactPhone: "Contact phone",
       address: "Address",
       notes: "Notes",
+      riskSector: "Risk sector",
+      selectSector: "Choose a sector…",
+      unclassified: "Unclassified",
+      noSectorsYet: "No sectors yet — add one under Directory → Risk sectors.",
       objectsTitle: "Objects (branches & franchises)",
       objectsCount: "{{count}} objects",
       noObjects: "No objects yet — add a branch, franchise or site for this company.",
@@ -658,6 +663,44 @@ export const enMessages = {
       deleteCompany: "Delete company",
       deleteConfirm:
         "Delete this company and all of its objects? This cannot be undone.",
+    },
+    riskSectors: {
+      title: "Risk sectors",
+      description:
+        "Industry and business-line classifications you tag each company with. The baseline risk on a sector colour-codes the directory and pre-fills risk assessments, so companies in higher-risk industries get the attention they deserve.",
+      emptyTitle: "No risk sectors yet",
+      emptyDescription:
+        "Add your first sector — e.g. Construction, Oil & Gas, Healthcare — so every company can carry a risk profile.",
+      new: "New sector",
+      edit: "Edit sector",
+      formHint:
+        "Name the sector (e.g. Construction), give it an optional short code and a baseline risk level. You can reclassify companies any time.",
+      name: "Name",
+      namePlaceholder: "Construction",
+      code: "Code",
+      descriptionField: "Description",
+      active: "Active",
+      defaultRisk: "Baseline risk",
+      created: "Sector added.",
+      updated: "Sector updated.",
+      deleted: "Sector removed.",
+      deleteConfirm: "Remove this risk sector?",
+      deleteWithCompaniesConfirm:
+        "This sector is assigned to {{count}} companies. Removing it will leave those companies unclassified. Continue?",
+      // Page summary chips
+      totalLabel: "Total sectors",
+      activeLabel: "Active",
+      taggedCompaniesLabel: "Companies tagged",
+      companyCountOne: "1 company",
+      companyCountMany: "{{count}} companies",
+      // Risk-level labels — kept separate from `modules.findings.severity`
+      // so the Directory can use its own phrasing if needed later.
+      risk: {
+        LOW: "Low",
+        MEDIUM: "Medium",
+        HIGH: "High",
+        CRITICAL: "Critical",
+      },
     },
     inspectionItems: {
       title: "Inspection items",
