@@ -25,7 +25,6 @@ import {
 } from "@/components/ui/select";
 import { useT } from "@/components/i18n-provider";
 import { createCompanyObject } from "../actions";
-import { RiskLevelBadge } from "../../risk-sectors/sector-badge";
 
 const SECTOR_UNCLASSIFIED = "__unclassified__";
 
@@ -34,8 +33,6 @@ export interface SectorOption {
   name: string;
   code: string | null;
   color: string | null;
-  levelTone: string | null;
-  levelName: string | null;
 }
 
 export function CreateObjectDialog({
@@ -133,12 +130,11 @@ export function CreateObjectDialog({
                     <SelectItem key={s.id} value={s.id}>
                       <span className="inline-flex items-center gap-2">
                         <span className="font-medium">{s.name}</span>
-                        {s.levelName && (
-                          <RiskLevelBadge
-                            tone={s.levelTone}
-                            label={s.levelName}
-                          />
-                        )}
+                        {s.code ? (
+                          <span className="text-xs text-muted-foreground">
+                            {s.code}
+                          </span>
+                        ) : null}
                       </span>
                     </SelectItem>
                   ))}

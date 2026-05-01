@@ -13,11 +13,6 @@ export const riskSectorCreateSchema = z.object({
     .nullable(),
   description: z.string().max(500).optional().nullable(),
   /**
-   * FK into the workspace's risk-level dictionary. Pass `null` to leave
-   * the sector unrated; callers validate it belongs to the same workspace.
-   */
-  riskLevelId: z.string().min(1).optional().nullable(),
-  /**
    * Accent colour token (e.g. "amber", "rose"). Kept loose — the UI treats
    * unknown values as the neutral chip, so typos are harmless.
    */

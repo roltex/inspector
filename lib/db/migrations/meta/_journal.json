@@ -15,6 +15,13 @@
       "when": 1777634276495,
       "tag": "0001_add_risk_directory",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1777644395962,
+      "tag": "0002_add_form_applicability",
+      "breakpoints": true
     }
   ]
 }

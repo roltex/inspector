@@ -8,11 +8,19 @@ import { useT } from "@/components/i18n-provider";
 import { ItemDialog } from "./item-dialog";
 import { FieldBuilderDialog } from "./field-builder";
 import { deleteInspectionItem, saveItemAsTemplate } from "./actions";
+import type { ApplicabilityPair } from "@/lib/validators/inspection-items";
+import type {
+  LevelChoice,
+  SectorChoice,
+} from "./applicability-matrix";
 
 export function ItemRowActions({
   orgSlug,
   item,
   categories,
+  sectors,
+  levels,
+  initialApplicability,
 }: {
   orgSlug: string;
   item: {
@@ -25,6 +33,9 @@ export function ItemRowActions({
     isActive: boolean;
   };
   categories: { id: string; name: string }[];
+  sectors: SectorChoice[];
+  levels: LevelChoice[];
+  initialApplicability: ApplicabilityPair[];
 }) {
   const t = useT();
   const [pending, start] = useTransition();
@@ -94,6 +105,9 @@ export function ItemRowActions({
         orgSlug={orgSlug}
         initial={item}
         categories={categories}
+        sectors={sectors}
+        levels={levels}
+        initialApplicability={initialApplicability}
         trigger={
           <Button variant="ghost" size="sm">
             <Pencil className="h-4 w-4" />

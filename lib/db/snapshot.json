@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-05-01T11:58:27.562Z",
+  "generatedAt": "2026-05-01T14:21:56.728Z",
   "tables": {
     "account": [
       {
@@ -747,17 +747,18 @@
       {
         "id": "ii_i1yzodybztckgv",
         "organization_id": "audmb3AC6uG6HGm0SHQCD",
-        "name": "დაბალი/საშუალო რისკის სექტორი (template)",
+        "name": "რისკის შეფასება",
         "description": null,
         "category": "რისკების შეფასება",
         "sort_order": 0,
         "is_active": true,
         "created_by_id": "jE1XbuSmwQSixHknchbUQ",
         "created_at": "2026-05-01T09:58:58.771Z",
-        "updated_at": "2026-05-01T09:58:58.771Z",
+        "updated_at": "2026-05-01T08:30:43.996Z",
         "category_id": "iic_c1033cd8acdf9577_06778bb6"
       }
     ],
+    "inspection_item_applicability": [],
     "inspection_item_category": [
       {
         "id": "iic_c1033cd8acdf9577_06778bb6",
@@ -2469,21 +2470,90 @@
         "updated_at": "2026-04-25T08:03:33.368Z"
       }
     ],
-    "risk_level": [],
+    "risk_level": [
+      {
+        "id": "rlvl_152mt9g83du0no",
+        "organization_id": "audmb3AC6uG6HGm0SHQCD",
+        "name": "Low",
+        "code": null,
+        "description": null,
+        "tone": "info",
+        "score": 0,
+        "sort_order": 0,
+        "is_active": true,
+        "created_by_id": "jE1XbuSmwQSixHknchbUQ",
+        "created_at": "2026-05-01T12:07:02.028Z",
+        "updated_at": "2026-05-01T12:07:02.028Z"
+      },
+      {
+        "id": "rlvl_d330stu5o6umb1",
+        "organization_id": "audmb3AC6uG6HGm0SHQCD",
+        "name": "Medium",
+        "code": null,
+        "description": null,
+        "tone": "warning",
+        "score": 0,
+        "sort_order": 0,
+        "is_active": true,
+        "created_by_id": "jE1XbuSmwQSixHknchbUQ",
+        "created_at": "2026-05-01T12:07:11.402Z",
+        "updated_at": "2026-05-01T12:07:11.402Z"
+      },
+      {
+        "id": "rlvl_wtze3y4wb9k1c3",
+        "organization_id": "audmb3AC6uG6HGm0SHQCD",
+        "name": "High",
+        "code": null,
+        "description": null,
+        "tone": "danger",
+        "score": 0,
+        "sort_order": 0,
+        "is_active": true,
+        "created_by_id": "jE1XbuSmwQSixHknchbUQ",
+        "created_at": "2026-05-01T12:07:20.379Z",
+        "updated_at": "2026-05-01T12:07:20.379Z"
+      },
+      {
+        "id": "rlvl_juy4hf5ban545i",
+        "organization_id": "audmb3AC6uG6HGm0SHQCD",
+        "name": "Critical",
+        "code": null,
+        "description": null,
+        "tone": "critical",
+        "score": 0,
+        "sort_order": 0,
+        "is_active": true,
+        "created_by_id": "jE1XbuSmwQSixHknchbUQ",
+        "created_at": "2026-05-01T12:07:29.701Z",
+        "updated_at": "2026-05-01T12:07:29.701Z"
+      }
+    ],
     "risk_sector": [
       {
-        "id": "rsec_1eauruilx23i1i",
+        "id": "rsec_7gib7ihw0he0i5",
         "organization_id": "audmb3AC6uG6HGm0SHQCD",
-        "name": "Construction",
+        "name": "ბასრი საგნები",
         "code": null,
-        "description": "asdasdasdasd",
+        "description": null,
         "color": null,
         "sort_order": 0,
         "is_active": true,
         "created_by_id": "jE1XbuSmwQSixHknchbUQ",
-        "created_at": "2026-05-01T10:58:04.785Z",
-        "updated_at": "2026-05-01T10:58:04.785Z",
-        "risk_level_id": null
+        "created_at": "2026-05-01T12:32:06.790Z",
+        "updated_at": "2026-05-01T12:32:06.790Z"
+      },
+      {
+        "id": "rsec_z5m84fwu8mzv9h",
+        "organization_id": "audmb3AC6uG6HGm0SHQCD",
+        "name": "ცხელი ზედაპირები",
+        "code": null,
+        "description": null,
+        "color": null,
+        "sort_order": 0,
+        "is_active": true,
+        "created_by_id": "jE1XbuSmwQSixHknchbUQ",
+        "created_at": "2026-05-01T12:33:28.019Z",
+        "updated_at": "2026-05-01T12:33:28.019Z"
       }
     ],
     "site": [],
@@ -2595,7 +2665,7 @@
         "image": null,
         "phone": null,
         "created_at": "2026-04-24T19:14:36.862Z",
-        "updated_at": "2026-05-01T06:01:46.926Z",
+        "updated_at": "2026-05-01T08:30:00.121Z",
         "super_admin": true,
         "banned_at": null,
         "ban_reason": null,

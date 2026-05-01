@@ -4,14 +4,13 @@ import { and, asc, eq } from "drizzle-orm";
 import { ArrowLeft, Building2, MapPin, Mail, Phone } from "lucide-react";
 import { requireMembership } from "@/lib/auth/session";
 import { db } from "@/lib/db/client";
-import { company, companyObject, riskLevel, riskSector } from "@/lib/db/schema";
+import { company, companyObject, riskSector } from "@/lib/db/schema";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page-header";
 import { can } from "@/lib/rbac/permissions";
 import { getT } from "@/lib/i18n";
-import { RiskLevelBadge } from "../../risk-sectors/sector-badge";
 import { listActiveRiskSectorOptions } from "../../risk-sectors/actions";
 import { CreateObjectDialog } from "./create-object-dialog";
 import { CompanyDangerZone } from "./company-danger-zone";
@@ -50,12 +49,9 @@ export default async function CompanyDetailPage({
         riskSectorId: companyObject.riskSectorId,
         sectorName: riskSector.name,
         sectorCode: riskSector.code,
-        levelName: riskLevel.name,
-        levelTone: riskLevel.tone,
       })
       .from(companyObject)
       .leftJoin(riskSector, eq(riskSector.id, companyObject.riskSectorId))
-      .leftJoin(riskLevel, eq(riskLevel.id, riskSector.riskLevelId))
       .where(
         and(
           eq(companyObject.companyId, row.id),
@@ -142,13 +138,11 @@ export default async function CompanyDetailPage({
                         {o.riskSectorId && o.sectorName && (
                           <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2 py-0.5 text-[11px] text-primary">
                             {o.sectorName}
-                            {o.levelName && (
-                              <RiskLevelBadge
-                                tone={o.levelTone}
-                                label={o.levelName}
-                                className="-my-1"
-                              />
-                            )}
+                            {o.sectorCode ? (
+                              <span className="text-muted-foreground">
+                                · {o.sectorCode}
+                              </span>
+                            ) : null}
                           </span>
                         )}
                         {!o.isActive && <Badge variant="secondary">{t("common.inactive")}</Badge>}

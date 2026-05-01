@@ -15,6 +15,10 @@ import { ItemDialog } from "./item-dialog";
 import { ItemRowActions } from "./item-row-actions";
 import { CategoryManagerDialog, type CategoryRow } from "./category-manager";
 import { TemplatePickerDialog } from "./template-picker-dialog";
+import { ApplicabilitySummary } from "./applicability-summary";
+import { listApplicabilityByItem } from "./actions";
+import { listActiveRiskSectorOptions } from "../risk-sectors/actions";
+import { listActiveRiskLevelOptions } from "../risk-levels/actions";
 
 export const metadata = { title: "Inspection forms" };
 export const dynamic = "force-dynamic";
@@ -28,30 +32,34 @@ export default async function InspectionItemsPage({
   const { t } = await getT();
   const canManage = can(m.role, "inspectionItems:manage");
 
-  const [items, categoryRows, countRows] = await Promise.all([
-    db
-      .select()
-      .from(inspectionItem)
-      .where(eq(inspectionItem.organizationId, m.organization.id))
-      .orderBy(
-        asc(inspectionItem.category),
-        asc(inspectionItem.sortOrder),
-        asc(inspectionItem.name),
-      ),
-    db
-      .select()
-      .from(inspectionItemCategory)
-      .where(eq(inspectionItemCategory.organizationId, m.organization.id))
-      .orderBy(asc(inspectionItemCategory.sortOrder), asc(inspectionItemCategory.name)),
-    db
-      .select({
-        categoryId: inspectionItem.categoryId,
-        c: sql<number>`count(*)::int`,
-      })
-      .from(inspectionItem)
-      .where(eq(inspectionItem.organizationId, m.organization.id))
-      .groupBy(inspectionItem.categoryId),
-  ]);
+  const [items, categoryRows, countRows, sectorOptions, levelOptions, applicabilityByItem] =
+    await Promise.all([
+      db
+        .select()
+        .from(inspectionItem)
+        .where(eq(inspectionItem.organizationId, m.organization.id))
+        .orderBy(
+          asc(inspectionItem.category),
+          asc(inspectionItem.sortOrder),
+          asc(inspectionItem.name),
+        ),
+      db
+        .select()
+        .from(inspectionItemCategory)
+        .where(eq(inspectionItemCategory.organizationId, m.organization.id))
+        .orderBy(asc(inspectionItemCategory.sortOrder), asc(inspectionItemCategory.name)),
+      db
+        .select({
+          categoryId: inspectionItem.categoryId,
+          c: sql<number>`count(*)::int`,
+        })
+        .from(inspectionItem)
+        .where(eq(inspectionItem.organizationId, m.organization.id))
+        .groupBy(inspectionItem.categoryId),
+      listActiveRiskSectorOptions(params.orgSlug),
+      listActiveRiskLevelOptions(params.orgSlug),
+      listApplicabilityByItem(params.orgSlug),
+    ]);
 
   const usageByCategory = new Map<string, number>();
   for (const r of countRows) {
@@ -68,12 +76,24 @@ export default async function InspectionItemsPage({
     itemCount: usageByCategory.get(c.id) ?? 0,
   }));
 
-  // The dialog needs a lighter shape (just id + name).
   const categoryOptions = categories
     .filter((c) => c.isActive)
     .map((c) => ({ id: c.id, name: c.name }));
 
-  // Group items by category for display.
+  // Shapes shared by the dialog + matrix.
+  const sectorChoices = sectorOptions.map((s) => ({
+    id: s.id,
+    name: s.name,
+    code: s.code,
+  }));
+  const levelChoices = levelOptions.map((l) => ({
+    id: l.id,
+    name: l.name,
+    code: l.code,
+    tone: l.tone,
+    score: l.score,
+  }));
+
   const grouped = new Map<string, typeof items>();
   for (const r of items) {
     const list = grouped.get(r.category) ?? [];
@@ -104,6 +124,8 @@ export default async function InspectionItemsPage({
               <ItemDialog
                 orgSlug={params.orgSlug}
                 categories={categoryOptions}
+                sectors={sectorChoices}
+                levels={levelChoices}
               />
             </div>
           ) : null
@@ -120,6 +142,8 @@ export default async function InspectionItemsPage({
               <ItemDialog
                 orgSlug={params.orgSlug}
                 categories={categoryOptions}
+                sectors={sectorChoices}
+                levels={levelChoices}
               />
             ) : null
           }
@@ -133,38 +157,48 @@ export default async function InspectionItemsPage({
                 <span className="text-xs text-muted-foreground">{rows.length}</span>
               </div>
               <ul className="divide-y">
-                {rows.map((it) => (
-                  <li key={it.id} className="flex items-start gap-3 px-5 py-3">
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <p className="font-medium">{it.name}</p>
-                        {!it.isActive && (
-                          <Badge variant="secondary">{t("common.inactive")}</Badge>
+                {rows.map((it) => {
+                  const pairs = applicabilityByItem[it.id] ?? [];
+                  return (
+                    <li key={it.id} className="flex items-start gap-3 px-5 py-3">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="font-medium">{it.name}</p>
+                          {!it.isActive && (
+                            <Badge variant="secondary">{t("common.inactive")}</Badge>
+                          )}
+                          <ApplicabilitySummary pairs={pairs} />
+                        </div>
+                        {it.description && (
+                          <p className="mt-0.5 text-sm text-muted-foreground">
+                            {it.description}
+                          </p>
                         )}
                       </div>
-                      {it.description && (
-                        <p className="mt-0.5 text-sm text-muted-foreground">
-                          {it.description}
-                        </p>
+                      {canManage && (
+                        <ItemRowActions
+                          orgSlug={params.orgSlug}
+                          categories={categoryOptions}
+                          sectors={sectorChoices}
+                          levels={levelChoices}
+                          initialApplicability={pairs.map((p) => ({
+                            riskSectorId: p.riskSectorId,
+                            riskLevelId: p.riskLevelId,
+                          }))}
+                          item={{
+                            id: it.id,
+                            name: it.name,
+                            description: it.description,
+                            categoryId: it.categoryId,
+                            category: it.category,
+                            sortOrder: it.sortOrder,
+                            isActive: it.isActive,
+                          }}
+                        />
                       )}
-                    </div>
-                    {canManage && (
-                      <ItemRowActions
-                        orgSlug={params.orgSlug}
-                        categories={categoryOptions}
-                        item={{
-                          id: it.id,
-                          name: it.name,
-                          description: it.description,
-                          categoryId: it.categoryId,
-                          category: it.category,
-                          sortOrder: it.sortOrder,
-                          isActive: it.isActive,
-                        }}
-                      />
-                    )}
-                  </li>
-                ))}
+                    </li>
+                  );
+                })}
               </ul>
             </Card>
           ))}

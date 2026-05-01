@@ -668,44 +668,43 @@ export const enMessages = {
     riskSectors: {
       title: "Inspect items",
       description:
-        "Industry and business-line classifications you tag each company object (branch / site) with. Every inspect item carries a baseline risk level from your own dictionary, so higher-risk sites get the attention they deserve.",
+        "Industry and business-line classifications you tag each company object (branch / site) with. Reference them from inspection forms together with a risk level to surface the right checks for every site.",
       emptyTitle: "No inspect items yet",
       emptyDescription:
-        "Add your first item — e.g. Construction, Oil & Gas, Healthcare — so every site can carry a risk profile.",
+        "Add your first item — e.g. Construction, Oil & Gas, Healthcare — so every site can carry a classification.",
       new: "New item",
       edit: "Edit item",
       formHint:
-        "Name the item (e.g. Construction), give it an optional short code and pick a baseline risk level. You can reclassify objects any time.",
+        "Name the item (e.g. Construction) and give it an optional short code. Inspection forms link to items and risk levels on the form builder.",
       name: "Name",
       namePlaceholder: "Construction",
       code: "Code",
       descriptionField: "Description",
       active: "Active",
-      baselineRisk: "Baseline risk",
-      pickLevel: "Pick a risk level…",
-      unrated: "Unrated",
-      noLevelsYet: "No risk levels defined yet.",
-      openLevels: "Open Risk levels",
       created: "Inspect item added.",
       updated: "Inspect item updated.",
       deleted: "Inspect item removed.",
       deleteConfirm: "Remove this inspect item?",
       deleteWithObjectsConfirm:
         "This item is assigned to {{count}} company objects. Removing it will leave them unclassified. Continue?",
-      // Page summary chips
+      deleteWithFormsConfirm:
+        "This item is referenced by {{count}} inspection forms. Removing it will drop those pairings. Continue?",
       totalLabel: "Total items",
       activeLabel: "Active",
       taggedObjectsLabel: "Objects tagged",
+      linkedFormsLabel: "Forms linked",
       objectCountOne: "1 object",
       objectCountMany: "{{count}} objects",
+      formCountOne: "Used by 1 form",
+      formCountMany: "Used by {{count}} forms",
     },
     riskLevels: {
       title: "Risk levels",
       description:
-        "Your workspace's own dictionary of baseline risk labels (e.g. Low / Medium / High / Critical — or anything that fits your operations). Inspect items pick a level from this list, so every chip and ranking in the app speaks your language.",
+        "Your workspace's own dictionary of risk labels (e.g. Low / Medium / High / Critical — or anything that fits your operations). Inspection forms pick pairs of inspect item × risk level on the form builder, so every chip and ranking in the app speaks your language.",
       emptyTitle: "No risk levels yet",
       emptyDescription:
-        "Create at least one level — Low, Medium, High, Critical is a good starting point — then return to Inspect items to pick one.",
+        "Create at least one level — Low, Medium, High, Critical is a good starting point — then wire them up from the inspection form builder.",
       new: "New level",
       edit: "Edit level",
       formHint:
@@ -724,13 +723,13 @@ export const enMessages = {
       updated: "Risk level updated.",
       deleted: "Risk level removed.",
       deleteConfirm: "Remove this risk level?",
-      deleteWithSectorsConfirm:
-        "This level is used by {{count}} inspect items. Removing it will leave them unrated. Continue?",
+      deleteWithFormsConfirm:
+        "This level is referenced by {{count}} inspection forms. Removing it will drop those pairings. Continue?",
       totalLabel: "Total levels",
       activeLabel: "Active",
-      usedByLabel: "Items using",
-      sectorCountOne: "Used by 1 inspect item",
-      sectorCountMany: "Used by {{count}} inspect items",
+      usedByLabel: "Forms using",
+      formCountOne: "Used by 1 form",
+      formCountMany: "Used by {{count}} forms",
       tones: {
         muted: "Muted",
         info: "Info",
@@ -761,6 +760,29 @@ export const enMessages = {
       updated: "Form updated.",
       deleted: "Form deleted.",
       deleteConfirm: "Delete this inspection form?",
+      applicability: {
+        title: "Applies to",
+        description:
+          "Pair inspect items with risk levels this form should match. Leave empty to make the form always available.",
+        rowHeading: "Inspect item",
+        rowActionsLabel: "Row actions",
+        selectRow: "All",
+        clearRow: "None",
+        selectAll: "Select all",
+        clearAll: "Clear",
+        unboundedHint: "No pairings — this form is always available when planning.",
+        boundedHint: "{{count}} pairing(s) — form is offered only when an object matches.",
+        selectedCount: "{{count}} pairs selected",
+        needSeeds: "Add inspect items and risk levels first",
+        needSeedsHint:
+          "You need at least one inspect item and one risk level before you can build applicability rules.",
+        openSectors: "Open Inspect items",
+        openLevels: "Open Risk levels",
+        alwaysLabel: "Always",
+        alwaysTooltip: "This form is offered for every object when planning.",
+        pairsCount: "{{count}} pairings",
+        popoverTitle: "Applies to",
+      },
       // Categories (related list)
       manageCategories: "Manage categories",
       categoriesTitle: "Inspection categories",

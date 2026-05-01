@@ -1,4 +1,4 @@
-import { Building2, ShieldAlert } from "lucide-react";
+import { Building2, ClipboardList, ShieldAlert } from "lucide-react";
 import { requireMembership } from "@/lib/auth/session";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -7,10 +7,8 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { can } from "@/lib/rbac/permissions";
 import { getT } from "@/lib/i18n";
 import { listRiskSectors } from "./actions";
-import { listActiveRiskLevelOptions } from "../risk-levels/actions";
 import { SectorDialog } from "./sector-dialog";
 import { SectorRowActions } from "./row-actions";
-import { RiskLevelBadge } from "./sector-badge";
 
 export const metadata = { title: "Inspect items" };
 export const dynamic = "force-dynamic";
@@ -24,15 +22,13 @@ export default async function RiskSectorsPage({
   const { t } = await getT();
   const canManage = can(m.role, "riskSectors:manage");
 
-  const [sectors, levelOptions] = await Promise.all([
-    listRiskSectors(params.orgSlug),
-    listActiveRiskLevelOptions(params.orgSlug),
-  ]);
+  const sectors = await listRiskSectors(params.orgSlug);
 
   const totals = {
     total: sectors.length,
     active: sectors.filter((s) => s.isActive).length,
     objects: sectors.reduce((sum, s) => sum + s.objectCount, 0),
+    forms: sectors.reduce((sum, s) => sum + s.formCount, 0),
   };
 
   return (
@@ -40,15 +36,10 @@ export default async function RiskSectorsPage({
       <PageHeader
         title={t("modules.riskSectors.title")}
         description={t("modules.riskSectors.description")}
-        actions={
-          canManage ? (
-            <SectorDialog orgSlug={params.orgSlug} levels={levelOptions} />
-          ) : null
-        }
+        actions={canManage ? <SectorDialog orgSlug={params.orgSlug} /> : null}
       />
 
-      {/* Summary chips — lightweight, just three totals */}
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <SummaryCard
           label={t("modules.riskSectors.totalLabel")}
           value={totals.total}
@@ -66,6 +57,12 @@ export default async function RiskSectorsPage({
           tone="primary"
           icon={<Building2 className="h-4 w-4" />}
         />
+        <SummaryCard
+          label={t("modules.riskSectors.linkedFormsLabel")}
+          value={totals.forms}
+          tone="primary"
+          icon={<ClipboardList className="h-4 w-4" />}
+        />
       </div>
 
       {sectors.length === 0 ? (
@@ -73,11 +70,7 @@ export default async function RiskSectorsPage({
           icon={<ShieldAlert className="h-5 w-5" />}
           title={t("modules.riskSectors.emptyTitle")}
           description={t("modules.riskSectors.emptyDescription")}
-          action={
-            canManage ? (
-              <SectorDialog orgSlug={params.orgSlug} levels={levelOptions} />
-            ) : null
-          }
+          action={canManage ? <SectorDialog orgSlug={params.orgSlug} /> : null}
         />
       ) : (
         <Card className="overflow-hidden">
@@ -98,16 +91,6 @@ export default async function RiskSectorsPage({
                         {s.code}
                       </span>
                     )}
-                    {s.riskLevelId && s.levelName ? (
-                      <RiskLevelBadge
-                        tone={s.levelTone}
-                        label={s.levelName}
-                      />
-                    ) : (
-                      <Badge variant="secondary">
-                        {t("modules.riskSectors.unrated")}
-                      </Badge>
-                    )}
                     {!s.isActive && (
                       <Badge variant="secondary">{t("common.inactive")}</Badge>
                     )}
@@ -117,13 +100,23 @@ export default async function RiskSectorsPage({
                       {s.description}
                     </p>
                   )}
-                  <p className="mt-0.5 flex items-center gap-1.5 text-xs text-muted-foreground">
-                    <Building2 className="h-3 w-3" />
-                    {s.objectCount === 1
-                      ? t("modules.riskSectors.objectCountOne")
-                      : t("modules.riskSectors.objectCountMany", {
-                          count: s.objectCount,
-                        })}
+                  <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                    <span className="inline-flex items-center gap-1.5">
+                      <Building2 className="h-3 w-3" />
+                      {s.objectCount === 1
+                        ? t("modules.riskSectors.objectCountOne")
+                        : t("modules.riskSectors.objectCountMany", {
+                            count: s.objectCount,
+                          })}
+                    </span>
+                    <span className="inline-flex items-center gap-1.5">
+                      <ClipboardList className="h-3 w-3" />
+                      {s.formCount === 1
+                        ? t("modules.riskSectors.formCountOne")
+                        : t("modules.riskSectors.formCountMany", {
+                            count: s.formCount,
+                          })}
+                    </span>
                   </p>
                 </div>
                 {canManage && (
@@ -134,13 +127,12 @@ export default async function RiskSectorsPage({
                       name: s.name,
                       code: s.code,
                       description: s.description,
-                      riskLevelId: s.riskLevelId,
                       color: s.color,
                       sortOrder: s.sortOrder,
                       isActive: s.isActive,
                       objectCount: s.objectCount,
+                      formCount: s.formCount,
                     }}
-                    levels={levelOptions}
                   />
                 )}
               </li>

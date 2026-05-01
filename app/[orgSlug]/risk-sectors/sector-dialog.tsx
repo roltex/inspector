@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, Plus } from "lucide-react";
@@ -18,47 +17,26 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useT } from "@/components/i18n-provider";
 import { createRiskSector, updateRiskSector } from "./actions";
-import { RiskLevelBadge } from "./sector-badge";
-
-const LEVEL_UNRATED = "__unrated__";
 
 interface SectorFormValues {
   id?: string;
   name: string;
   code: string | null;
   description: string | null;
-  riskLevelId: string | null;
   color: string | null;
   sortOrder: number;
   isActive: boolean;
 }
 
-export interface LevelOption {
-  id: string;
-  name: string;
-  code: string | null;
-  tone: string;
-  score: number;
-}
-
 export function SectorDialog({
   orgSlug,
   initial,
-  levels,
   trigger,
 }: {
   orgSlug: string;
   initial?: SectorFormValues;
-  levels: LevelOption[];
   trigger?: React.ReactNode;
 }) {
   const t = useT();
@@ -67,10 +45,6 @@ export function SectorDialog({
   const [pending, start] = useTransition();
   const isEdit = Boolean(initial?.id);
 
-  const [levelId, setLevelId] = useState<string>(
-    initial?.riskLevelId ?? LEVEL_UNRATED,
-  );
-
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
@@ -78,7 +52,6 @@ export function SectorDialog({
       name: String(fd.get("name") ?? ""),
       code: String(fd.get("code") ?? "") || null,
       description: String(fd.get("description") ?? "") || null,
-      riskLevelId: levelId && levelId !== LEVEL_UNRATED ? levelId : null,
       color: String(fd.get("color") ?? "") || null,
       sortOrder: Number(fd.get("sortOrder") ?? 0),
       isActive: fd.get("isActive") === "on",
@@ -149,48 +122,6 @@ export function SectorDialog({
                 className="font-mono uppercase"
               />
             </div>
-          </div>
-
-          <div className="space-y-1.5">
-            <Label htmlFor="riskLevelId">
-              {t("modules.riskSectors.baselineRisk")}
-            </Label>
-            {levels.length === 0 ? (
-              <div className="rounded-lg border border-dashed px-3 py-2 text-sm text-muted-foreground">
-                {t("modules.riskSectors.noLevelsYet")}{" "}
-                <Link
-                  href={`/${orgSlug}/risk-levels`}
-                  className="text-primary underline-offset-4 hover:underline"
-                >
-                  {t("modules.riskSectors.openLevels")}
-                </Link>
-              </div>
-            ) : (
-              <Select value={levelId} onValueChange={setLevelId}>
-                <SelectTrigger id="riskLevelId">
-                  <SelectValue
-                    placeholder={t("modules.riskSectors.pickLevel")}
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={LEVEL_UNRATED}>
-                    {t("modules.riskSectors.unrated")}
-                  </SelectItem>
-                  {levels.map((lv) => (
-                    <SelectItem key={lv.id} value={lv.id}>
-                      <span className="inline-flex items-center gap-2">
-                        <RiskLevelBadge tone={lv.tone} label={lv.name} />
-                        {lv.code ? (
-                          <span className="text-[11px] text-muted-foreground">
-                            · {lv.code}
-                          </span>
-                        ) : null}
-                      </span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
           </div>
 
           <div className="space-y-1.5">

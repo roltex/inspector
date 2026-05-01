@@ -323,10 +323,12 @@ export const riskLevel = pgTable(
 );
 
 /**
- * Risk sectors — an industry / business-line classification used to tag
- * company objects (branches / sites) with a baseline risk profile
- * (e.g. Construction, Oil & Gas, Healthcare). Each sector points at a
- * user-defined `risk_level` so the baseline is fully customisable.
+ * Inspect items — an industry / business-line classification used to tag
+ * company objects (branches / sites). Previously carried a single baseline
+ * risk level; that relation now lives on each inspection form's
+ * applicability rules (see `inspectionItemApplicability`), so a form can
+ * match any combination of inspect items × risk levels the workspace cares
+ * about. Keeping the `risk_sector` table name for data-migration safety.
  */
 export const riskSector = pgTable(
   "risk_sector",
@@ -339,14 +341,6 @@ export const riskSector = pgTable(
     /** Short 2–6 char code, handy for dashboards (e.g. "CON", "OIL"). */
     code: text("code"),
     description: text("description"),
-    /**
-     * FK into the workspace's risk-level dictionary. Nullable so a sector
-     * can exist before any level is defined — the UI shows an "unrated"
-     * chip in that case.
-     */
-    riskLevelId: text("risk_level_id").references(() => riskLevel.id, {
-      onDelete: "set null",
-    }),
     /** Optional accent colour for chips / pills (e.g. "amber", "rose"). */
     color: text("color"),
     sortOrder: integer("sort_order").notNull().default(0),
@@ -361,7 +355,6 @@ export const riskSector = pgTable(
       t.organizationId,
       t.name,
     ),
-    levelIdx: index("risk_sector_level_idx").on(t.riskLevelId),
   }),
 );
 
@@ -568,6 +561,54 @@ export const inspectionItem = pgTable(
     orgIdx: index("inspection_item_org_idx").on(t.organizationId),
     orgCategoryIdx: index("inspection_item_org_category_idx").on(t.organizationId, t.category, t.sortOrder),
     orgCategoryFkIdx: index("inspection_item_org_category_id_idx").on(t.organizationId, t.categoryId),
+  }),
+);
+
+/**
+ * Applicability matrix — a many-to-many join that links an inspection form
+ * (`inspection_item`) to the (inspect-item × risk-level) pairs it should
+ * surface for. Inspectors can filter their planning picker by matching
+ * rows, so a "Fire extinguisher check" form can apply to "Construction at
+ * High/Critical risk" without polluting picks for unrelated sites.
+ *
+ * (organization_id, inspection_item_id, risk_sector_id, risk_level_id) is
+ * the natural key; we keep a surrogate `id` column so the row can be
+ * referenced from downstream features without touching the composite key.
+ */
+export const inspectionItemApplicability = pgTable(
+  "inspection_item_applicability",
+  {
+    id: text("id").primaryKey(),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organization.id, { onDelete: "cascade" }),
+    inspectionItemId: text("inspection_item_id")
+      .notNull()
+      .references(() => inspectionItem.id, { onDelete: "cascade" }),
+    riskSectorId: text("risk_sector_id")
+      .notNull()
+      .references(() => riskSector.id, { onDelete: "cascade" }),
+    riskLevelId: text("risk_level_id")
+      .notNull()
+      .references(() => riskLevel.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (t) => ({
+    orgIdx: index("inspection_item_applicability_org_idx").on(t.organizationId),
+    itemIdx: index("inspection_item_applicability_item_idx").on(
+      t.inspectionItemId,
+    ),
+    sectorIdx: index("inspection_item_applicability_sector_idx").on(
+      t.riskSectorId,
+    ),
+    levelIdx: index("inspection_item_applicability_level_idx").on(
+      t.riskLevelId,
+    ),
+    uniqTriple: uniqueIndex("inspection_item_applicability_unique_triple").on(
+      t.inspectionItemId,
+      t.riskSectorId,
+      t.riskLevelId,
+    ),
   }),
 );
 
@@ -1361,3 +1402,5 @@ export type NewInspectionItemCategory = typeof inspectionItemCategory.$inferInse
 export type InspectionItemField = typeof inspectionItemField.$inferSelect;
 export type NewInspectionItemField = typeof inspectionItemField.$inferInsert;
 export type InspectionItemSelection = typeof inspectionItemSelection.$inferSelect;
+export type InspectionItemApplicability = typeof inspectionItemApplicability.$inferSelect;
+export type NewInspectionItemApplicability = typeof inspectionItemApplicability.$inferInsert;

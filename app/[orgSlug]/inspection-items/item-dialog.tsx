@@ -29,6 +29,12 @@ import {
   createInspectionItemCategory,
   updateInspectionItem,
 } from "./actions";
+import type { ApplicabilityPair } from "@/lib/validators/inspection-items";
+import {
+  ApplicabilityMatrix,
+  type LevelChoice,
+  type SectorChoice,
+} from "./applicability-matrix";
 
 interface ItemFormValues {
   id?: string;
@@ -52,12 +58,18 @@ export function ItemDialog({
   trigger,
   initial,
   categories,
+  sectors,
+  levels,
+  initialApplicability,
   onClosed,
 }: {
   orgSlug: string;
   trigger?: React.ReactNode;
   initial?: ItemFormValues;
   categories: CategoryOption[];
+  sectors: SectorChoice[];
+  levels: LevelChoice[];
+  initialApplicability?: ApplicabilityPair[];
   onClosed?: () => void;
 }) {
   const t = useT();
@@ -66,17 +78,17 @@ export function ItemDialog({
   const [creatingCat, startCreatingCat] = useTransition();
   const isEdit = Boolean(initial?.id);
 
-  // Picked category (id) — defaults to the row's existing categoryId, falls
-  // back to the first available, or empty when there are none yet.
   const [categoryId, setCategoryId] = useState<string>(
     initial?.categoryId ?? categories[0]?.id ?? "",
   );
-  // Local copy of categories so we can append a freshly created one without
-  // a full page round-trip.
   const [localCategories, setLocalCategories] = useState<CategoryOption[]>(categories);
 
   const [showInlineCreate, setShowInlineCreate] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
+
+  const [applicability, setApplicability] = useState<ApplicabilityPair[]>(
+    initialApplicability ?? [],
+  );
 
   function handleOpen(o: boolean) {
     setOpen(o);
@@ -85,9 +97,10 @@ export function ItemDialog({
       setShowInlineCreate(false);
       setNewCategoryName("");
     } else {
-      // Re-sync from props (server can have new categories now).
       setLocalCategories(categories);
       setCategoryId(initial?.categoryId ?? categories[0]?.id ?? "");
+      // Reset matrix state to the latest initial payload when reopening.
+      setApplicability(initialApplicability ?? []);
     }
   }
 
@@ -104,6 +117,7 @@ export function ItemDialog({
       categoryId,
       sortOrder: Number(fd.get("sortOrder") ?? 0),
       isActive: fd.get("isActive") === "on",
+      applicability,
     };
     start(async () => {
       try {
@@ -162,14 +176,14 @@ export function ItemDialog({
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="max-h-[92vh] overflow-y-auto sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>
             {isEdit ? t("modules.inspectionItems.edit") : t("modules.inspectionItems.new")}
           </DialogTitle>
           <DialogDescription>{t("modules.inspectionItems.formHint")}</DialogDescription>
         </DialogHeader>
-        <form onSubmit={onSubmit} className="space-y-3">
+        <form onSubmit={onSubmit} className="space-y-4">
           <div className="space-y-1.5">
             <Label htmlFor="name">{t("modules.inspectionItems.name")}</Label>
             <Input
@@ -282,6 +296,25 @@ export function ItemDialog({
               {t("modules.inspectionItems.active")}
             </label>
           </div>
+
+          <div className="space-y-2 border-t pt-4">
+            <div>
+              <Label className="text-sm">
+                {t("modules.inspectionItems.applicability.title")}
+              </Label>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                {t("modules.inspectionItems.applicability.description")}
+              </p>
+            </div>
+            <ApplicabilityMatrix
+              orgSlug={orgSlug}
+              sectors={sectors}
+              levels={levels}
+              value={applicability}
+              onChange={setApplicability}
+            />
+          </div>
+
           <DialogFooter>
             <Button type="button" variant="ghost" onClick={() => setOpen(false)} disabled={pending}>
               {t("common.cancel")}

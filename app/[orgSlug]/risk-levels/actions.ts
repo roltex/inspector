@@ -1,10 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { and, asc, eq, sql } from "drizzle-orm";
+import { and, asc, countDistinct, eq } from "drizzle-orm";
 import { requirePermission, requireMembership } from "@/lib/auth/session";
 import { db } from "@/lib/db/client";
-import { riskLevel, riskSector } from "@/lib/db/schema";
+import { inspectionItemApplicability, riskLevel } from "@/lib/db/schema";
 import { createId } from "@/lib/db/ids";
 import {
   riskLevelCreateSchema,
@@ -21,7 +21,12 @@ async function getOwnedLevel(orgId: string, id: string) {
   return row;
 }
 
-/** List every risk level in the caller's workspace + sector usage counts. */
+/**
+ * List every risk level in the caller's workspace, annotated with the
+ * number of distinct inspection forms that currently reference it through
+ * the applicability matrix. "0 forms" is a useful signal that the level
+ * is safe to rename or delete.
+ */
 export async function listRiskLevels(orgSlug: string) {
   const m = await requireMembership(orgSlug);
 
@@ -37,12 +42,14 @@ export async function listRiskLevels(orgSlug: string) {
       ),
     db
       .select({
-        riskLevelId: riskSector.riskLevelId,
-        c: sql<number>`count(*)::int`,
+        riskLevelId: inspectionItemApplicability.riskLevelId,
+        c: countDistinct(inspectionItemApplicability.inspectionItemId),
       })
-      .from(riskSector)
-      .where(eq(riskSector.organizationId, m.organization.id))
-      .groupBy(riskSector.riskLevelId),
+      .from(inspectionItemApplicability)
+      .where(
+        eq(inspectionItemApplicability.organizationId, m.organization.id),
+      )
+      .groupBy(inspectionItemApplicability.riskLevelId),
   ]);
 
   const usage = new Map<string, number>();
@@ -50,7 +57,7 @@ export async function listRiskLevels(orgSlug: string) {
     if (r.riskLevelId) usage.set(r.riskLevelId, Number(r.c));
   }
 
-  return levels.map((l) => ({ ...l, sectorCount: usage.get(l.id) ?? 0 }));
+  return levels.map((l) => ({ ...l, formCount: usage.get(l.id) ?? 0 }));
 }
 
 /** Thin option list — used by the risk-sector form picker. */
@@ -111,7 +118,7 @@ export async function createRiskLevel(orgSlug: string, input: unknown) {
   });
 
   revalidatePath(`/${orgSlug}/risk-levels`);
-  revalidatePath(`/${orgSlug}/risk-sectors`);
+  revalidatePath(`/${orgSlug}/inspection-items`);
   return { id };
 }
 
@@ -144,15 +151,16 @@ export async function updateRiskLevel(
     );
 
   revalidatePath(`/${orgSlug}/risk-levels`);
-  revalidatePath(`/${orgSlug}/risk-sectors`);
+  revalidatePath(`/${orgSlug}/inspection-items`);
 }
 
 export async function deleteRiskLevel(orgSlug: string, id: string) {
   const m = await requirePermission(orgSlug, "riskLevels:manage");
   await getOwnedLevel(m.organization.id, id);
 
-  // `risk_sector.risk_level_id` is ON DELETE SET NULL, so sectors using
-  // this level are preserved but become "unrated".
+  // `inspection_item_applicability.risk_level_id` is ON DELETE CASCADE, so
+  // any matrix rows referencing this level vanish with it. Forms themselves
+  // are untouched — they just lose that specific applicability pairing.
   await db
     .delete(riskLevel)
     .where(
@@ -163,5 +171,5 @@ export async function deleteRiskLevel(orgSlug: string, id: string) {
     );
 
   revalidatePath(`/${orgSlug}/risk-levels`);
-  revalidatePath(`/${orgSlug}/risk-sectors`);
+  revalidatePath(`/${orgSlug}/inspection-items`);
 }

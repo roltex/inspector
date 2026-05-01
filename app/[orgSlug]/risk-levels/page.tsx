@@ -1,4 +1,4 @@
-import { Gauge, ShieldAlert } from "lucide-react";
+import { ClipboardList, Gauge } from "lucide-react";
 import { requireMembership } from "@/lib/auth/session";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -28,7 +28,7 @@ export default async function RiskLevelsPage({
   const totals = {
     total: levels.length,
     active: levels.filter((l) => l.isActive).length,
-    sectors: levels.reduce((sum, l) => sum + l.sectorCount, 0),
+    forms: levels.reduce((sum, l) => sum + l.formCount, 0),
   };
 
   return (
@@ -53,9 +53,9 @@ export default async function RiskLevelsPage({
         />
         <SummaryCard
           label={t("modules.riskLevels.usedByLabel")}
-          value={totals.sectors}
+          value={totals.forms}
           tone="primary"
-          icon={<ShieldAlert className="h-4 w-4" />}
+          icon={<ClipboardList className="h-4 w-4" />}
         />
       </div>
 
@@ -98,11 +98,11 @@ export default async function RiskLevelsPage({
                     </p>
                   )}
                   <p className="mt-0.5 flex items-center gap-1.5 text-xs text-muted-foreground">
-                    <ShieldAlert className="h-3 w-3" />
-                    {l.sectorCount === 1
-                      ? t("modules.riskLevels.sectorCountOne")
-                      : t("modules.riskLevels.sectorCountMany", {
-                          count: l.sectorCount,
+                    <ClipboardList className="h-3 w-3" />
+                    {l.formCount === 1
+                      ? t("modules.riskLevels.formCountOne")
+                      : t("modules.riskLevels.formCountMany", {
+                          count: l.formCount,
                         })}
                   </p>
                 </div>
@@ -118,7 +118,7 @@ export default async function RiskLevelsPage({
                       score: l.score,
                       sortOrder: l.sortOrder,
                       isActive: l.isActive,
-                      sectorCount: l.sectorCount,
+                      formCount: l.formCount,
                     }}
                   />
                 )}

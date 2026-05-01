@@ -17,7 +17,7 @@ interface LevelShape {
   score: number;
   sortOrder: number;
   isActive: boolean;
-  sectorCount: number;
+  formCount: number;
 }
 
 export function LevelRowActions({
@@ -32,9 +32,9 @@ export function LevelRowActions({
 
   function onDelete() {
     const message =
-      level.sectorCount > 0
-        ? t("modules.riskLevels.deleteWithSectorsConfirm", {
-            count: level.sectorCount,
+      level.formCount > 0
+        ? t("modules.riskLevels.deleteWithFormsConfirm", {
+            count: level.formCount,
           })
         : t("modules.riskLevels.deleteConfirm");
     if (!confirm(message)) return;

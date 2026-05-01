@@ -1,17 +1,21 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { and, asc, eq, isNull, or, sql } from "drizzle-orm";
+import { and, asc, eq, inArray, isNull, or, sql } from "drizzle-orm";
 import { requirePermission, requireMembership } from "@/lib/auth/session";
 import { db } from "@/lib/db/client";
 import {
   inspectionItem,
+  inspectionItemApplicability,
   inspectionItemCategory,
   inspectionItemField,
   inspectionItemTemplate,
+  riskLevel,
+  riskSector,
 } from "@/lib/db/schema";
 import { createId } from "@/lib/db/ids";
 import {
+  type ApplicabilityPair,
   inspectionItemCreateSchema,
   inspectionItemUpdateSchema,
 } from "@/lib/validators/inspection-items";
@@ -61,6 +65,170 @@ async function getOwnedCategory(orgId: string, categoryId: string) {
   return row;
 }
 
+/**
+ * Validate that every sector and level id in the payload really belongs to
+ * this workspace. Returns deduplicated pairs ready to be inserted into the
+ * junction — throws with a friendly message when an id is missing or from
+ * another tenant.
+ */
+async function resolveApplicabilityPairs(
+  orgId: string,
+  pairs: ApplicabilityPair[],
+): Promise<ApplicabilityPair[]> {
+  if (pairs.length === 0) return [];
+
+  const sectorIds = Array.from(new Set(pairs.map((p) => p.riskSectorId)));
+  const levelIds = Array.from(new Set(pairs.map((p) => p.riskLevelId)));
+
+  const [sectors, levels] = await Promise.all([
+    db
+      .select({ id: riskSector.id })
+      .from(riskSector)
+      .where(
+        and(
+          eq(riskSector.organizationId, orgId),
+          inArray(riskSector.id, sectorIds),
+        ),
+      ),
+    db
+      .select({ id: riskLevel.id })
+      .from(riskLevel)
+      .where(
+        and(
+          eq(riskLevel.organizationId, orgId),
+          inArray(riskLevel.id, levelIds),
+        ),
+      ),
+  ]);
+
+  const allowedSectors = new Set(sectors.map((r) => r.id));
+  const allowedLevels = new Set(levels.map((r) => r.id));
+  for (const p of pairs) {
+    if (!allowedSectors.has(p.riskSectorId)) {
+      throw new Error("Inspect item not found in this workspace.");
+    }
+    if (!allowedLevels.has(p.riskLevelId)) {
+      throw new Error("Risk level not found in this workspace.");
+    }
+  }
+
+  const seen = new Set<string>();
+  const deduped: ApplicabilityPair[] = [];
+  for (const p of pairs) {
+    const k = `${p.riskSectorId}|${p.riskLevelId}`;
+    if (seen.has(k)) continue;
+    seen.add(k);
+    deduped.push(p);
+  }
+  return deduped;
+}
+
+/**
+ * Replace the applicability rows for a single inspection form. Delete-then-
+ * insert keeps the code simple; the triple is unique so the inserts can't
+ * clash with themselves.
+ */
+async function replaceApplicabilityFor(
+  orgId: string,
+  inspectionItemId: string,
+  pairs: ApplicabilityPair[],
+) {
+  await db
+    .delete(inspectionItemApplicability)
+    .where(
+      and(
+        eq(inspectionItemApplicability.organizationId, orgId),
+        eq(inspectionItemApplicability.inspectionItemId, inspectionItemId),
+      ),
+    );
+  if (pairs.length === 0) return;
+  await db.insert(inspectionItemApplicability).values(
+    pairs.map((p) => ({
+      id: createId("iia"),
+      organizationId: orgId,
+      inspectionItemId,
+      riskSectorId: p.riskSectorId,
+      riskLevelId: p.riskLevelId,
+    })),
+  );
+}
+
+/** Applicability rows for a single form, used when hydrating the edit dialog. */
+export async function listApplicabilityForItem(
+  orgSlug: string,
+  inspectionItemId: string,
+): Promise<ApplicabilityPair[]> {
+  const m = await requireMembership(orgSlug);
+  const rows = await db
+    .select({
+      riskSectorId: inspectionItemApplicability.riskSectorId,
+      riskLevelId: inspectionItemApplicability.riskLevelId,
+    })
+    .from(inspectionItemApplicability)
+    .where(
+      and(
+        eq(inspectionItemApplicability.organizationId, m.organization.id),
+        eq(inspectionItemApplicability.inspectionItemId, inspectionItemId),
+      ),
+    );
+  return rows;
+}
+
+/**
+ * Applicability grouped by form id — handy for rendering the summary chip
+ * on every row of the forms list without an N+1 pattern.
+ */
+export async function listApplicabilityByItem(orgSlug: string): Promise<
+  Record<
+    string,
+    Array<{
+      riskSectorId: string;
+      riskSectorName: string;
+      riskLevelId: string;
+      riskLevelName: string;
+      riskLevelTone: string;
+    }>
+  >
+> {
+  const m = await requireMembership(orgSlug);
+  const rows = await db
+    .select({
+      inspectionItemId: inspectionItemApplicability.inspectionItemId,
+      riskSectorId: inspectionItemApplicability.riskSectorId,
+      riskSectorName: riskSector.name,
+      riskLevelId: inspectionItemApplicability.riskLevelId,
+      riskLevelName: riskLevel.name,
+      riskLevelTone: riskLevel.tone,
+    })
+    .from(inspectionItemApplicability)
+    .leftJoin(riskSector, eq(inspectionItemApplicability.riskSectorId, riskSector.id))
+    .leftJoin(riskLevel, eq(inspectionItemApplicability.riskLevelId, riskLevel.id))
+    .where(eq(inspectionItemApplicability.organizationId, m.organization.id));
+
+  const byItem: Record<
+    string,
+    Array<{
+      riskSectorId: string;
+      riskSectorName: string;
+      riskLevelId: string;
+      riskLevelName: string;
+      riskLevelTone: string;
+    }>
+  > = {};
+  for (const r of rows) {
+    const bucket = byItem[r.inspectionItemId] ?? [];
+    bucket.push({
+      riskSectorId: r.riskSectorId,
+      riskSectorName: r.riskSectorName ?? "",
+      riskLevelId: r.riskLevelId,
+      riskLevelName: r.riskLevelName ?? "",
+      riskLevelTone: r.riskLevelTone ?? "muted",
+    });
+    byItem[r.inspectionItemId] = bucket;
+  }
+  return byItem;
+}
+
 /* -------------------------------------------------------------------------- */
 /*  Inspection Items                                                          */
 /* -------------------------------------------------------------------------- */
@@ -70,8 +238,9 @@ export async function createInspectionItem(orgSlug: string, input: unknown) {
   const data = inspectionItemCreateSchema.parse(input);
   const cat = await getOwnedCategory(m.organization.id, data.categoryId);
 
+  const id = createId("ii");
   await db.insert(inspectionItem).values({
-    id: createId("ii"),
+    id,
     organizationId: m.organization.id,
     name: data.name,
     description: data.description ?? null,
@@ -81,6 +250,14 @@ export async function createInspectionItem(orgSlug: string, input: unknown) {
     isActive: data.isActive ?? true,
     createdById: m.user.id,
   });
+
+  if (data.applicability && data.applicability.length > 0) {
+    const pairs = await resolveApplicabilityPairs(
+      m.organization.id,
+      data.applicability,
+    );
+    await replaceApplicabilityFor(m.organization.id, id, pairs);
+  }
   revalidatePath(`/${orgSlug}/inspection-items`);
 }
 
@@ -113,6 +290,15 @@ export async function updateInspectionItem(
         eq(inspectionItem.organizationId, m.organization.id),
       ),
     );
+
+  // `applicability: undefined` ⇒ don't touch existing rows; `[]` ⇒ clear.
+  if (data.applicability !== undefined) {
+    const pairs = await resolveApplicabilityPairs(
+      m.organization.id,
+      data.applicability,
+    );
+    await replaceApplicabilityFor(m.organization.id, id, pairs);
+  }
   revalidatePath(`/${orgSlug}/inspection-items`);
 }
 
