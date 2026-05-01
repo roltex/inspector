@@ -25,7 +25,7 @@ async function getOwnedSector(orgId: string, id: string) {
     .from(riskSector)
     .where(and(eq(riskSector.id, id), eq(riskSector.organizationId, orgId)))
     .limit(1);
-  if (!row) throw new Error("Risk sector not found in this workspace");
+  if (!row) throw new Error("Inspect item not found in this workspace");
   return row;
 }
 
@@ -132,7 +132,7 @@ export async function createRiskSector(orgSlug: string, input: unknown) {
     )
     .limit(1);
   if (existing) {
-    throw new Error("A sector with this name already exists in this workspace.");
+    throw new Error("An inspect item with this name already exists in this workspace.");
   }
 
   await assertOwnedLevel(m.organization.id, data.riskLevelId ?? null);

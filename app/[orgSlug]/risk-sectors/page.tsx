@@ -12,7 +12,7 @@ import { SectorDialog } from "./sector-dialog";
 import { SectorRowActions } from "./row-actions";
 import { RiskLevelBadge } from "./sector-badge";
 
-export const metadata = { title: "Risk sectors" };
+export const metadata = { title: "Inspect items" };
 export const dynamic = "force-dynamic";
 
 export default async function RiskSectorsPage({

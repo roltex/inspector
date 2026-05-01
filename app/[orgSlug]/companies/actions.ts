@@ -26,7 +26,7 @@ async function assertOwnedRiskSector(orgId: string, id: string | null | undefine
     .from(riskSector)
     .where(and(eq(riskSector.id, id), eq(riskSector.organizationId, orgId)))
     .limit(1);
-  if (!row) throw new Error("Risk sector not found in this workspace");
+  if (!row) throw new Error("Inspect item not found in this workspace");
   return row.id;
 }
 
