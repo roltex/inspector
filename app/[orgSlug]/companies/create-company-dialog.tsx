@@ -16,35 +16,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useT } from "@/components/i18n-provider";
 import { createCompany } from "./actions";
 
-const SECTOR_UNCLASSIFIED = "__unclassified__";
-
-interface SectorOption {
-  id: string;
-  name: string;
-  code: string | null;
-}
-
-export function CreateCompanyDialog({
-  orgSlug,
-  sectors = [],
-}: {
-  orgSlug: string;
-  sectors?: SectorOption[];
-}) {
+export function CreateCompanyDialog({ orgSlug }: { orgSlug: string }) {
   const t = useT();
   const [open, setOpen] = useState(false);
   const [pending, start] = useTransition();
-  const [riskSectorId, setRiskSectorId] = useState<string>(SECTOR_UNCLASSIFIED);
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -54,10 +32,6 @@ export function CreateCompanyDialog({
         await createCompany(orgSlug, {
           name: String(fd.get("name") ?? ""),
           code: String(fd.get("code") ?? ""),
-          riskSectorId:
-            riskSectorId && riskSectorId !== SECTOR_UNCLASSIFIED
-              ? riskSectorId
-              : null,
           contactName: String(fd.get("contactName") ?? ""),
           contactEmail: String(fd.get("contactEmail") ?? ""),
           contactPhone: String(fd.get("contactPhone") ?? ""),
@@ -88,47 +62,7 @@ export function CreateCompanyDialog({
         </DialogHeader>
         <form onSubmit={onSubmit} className="space-y-3">
           <Field id="name" label={t("modules.companies.name")} required minLength={2} />
-          <div className="grid gap-3 sm:grid-cols-2">
-            <Field id="code" label={t("modules.companies.code")} hint={t("common.optional")} />
-            <div className="space-y-1.5">
-              <Label htmlFor="riskSectorId">
-                {t("modules.companies.riskSector")}
-                <span className="ml-1 text-xs font-normal text-muted-foreground">
-                  ({t("common.optional")})
-                </span>
-              </Label>
-              <Select
-                value={riskSectorId}
-                onValueChange={setRiskSectorId}
-                disabled={sectors.length === 0}
-              >
-                <SelectTrigger id="riskSectorId">
-                  <SelectValue
-                    placeholder={
-                      sectors.length === 0
-                        ? t("modules.companies.noSectorsYet")
-                        : t("modules.companies.selectSector")
-                    }
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={SECTOR_UNCLASSIFIED}>
-                    {t("modules.companies.unclassified")}
-                  </SelectItem>
-                  {sectors.map((s) => (
-                    <SelectItem key={s.id} value={s.id}>
-                      {s.name}
-                      {s.code ? (
-                        <span className="ml-1 text-xs text-muted-foreground">
-                          · {s.code}
-                        </span>
-                      ) : null}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+          <Field id="code" label={t("modules.companies.code")} hint={t("common.optional")} />
           <div className="grid gap-3 sm:grid-cols-2">
             <Field id="contactName" label={t("modules.companies.contactName")} hint={t("common.optional")} />
             <Field id="contactEmail" label={t("modules.companies.contactEmail")} type="email" hint={t("common.optional")} />
@@ -156,16 +90,27 @@ export function CreateCompanyDialog({
 function Field({
   id,
   label,
+  type = "text",
+  required,
+  minLength,
   hint,
-  ...rest
-}: { id: string; label: string; hint?: string } & React.ComponentProps<typeof Input>) {
+}: {
+  id: string;
+  label: string;
+  type?: string;
+  required?: boolean;
+  minLength?: number;
+  hint?: string;
+}) {
   return (
     <div className="space-y-1.5">
       <Label htmlFor={id}>
         {label}
-        {hint && <span className="ml-1 text-xs font-normal text-muted-foreground">({hint})</span>}
+        {hint ? (
+          <span className="ml-1 text-xs font-normal text-muted-foreground">({hint})</span>
+        ) : null}
       </Label>
-      <Input id={id} name={id} {...rest} />
+      <Input id={id} name={id} type={type} required={required} minLength={minLength} />
     </div>
   );
 }

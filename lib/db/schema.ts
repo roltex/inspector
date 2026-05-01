@@ -280,12 +280,53 @@ export const department = pgTable(
 /* -------------------------------------------------------------------------- */
 
 /**
- * Risk sectors — an industry / business-line classification used to tag
- * companies with a baseline risk profile (e.g. Construction, Oil & Gas,
- * Healthcare). Each sector carries a default severity that helps pre-fill
- * risk assessments and drive colour-coded UI in the directory.
+ * Risk levels — a *user-defined*, workspace-scoped dictionary of baseline
+ * risk labels (e.g. "Low", "Medium", "High", "Critical", or anything the
+ * workspace prefers). Every risk sector picks one of these as its
+ * baseline, and UI reads the label / tone straight from this row rather
+ * than a hard-coded enum.
  *
- * Defined BEFORE `company` because `company` references it.
+ * Defined BEFORE `risk_sector` because `risk_sector` references it.
+ */
+export const riskLevel = pgTable(
+  "risk_level",
+  {
+    id: text("id").primaryKey(),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organization.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    /** Optional short code, handy for exports (e.g. "LOW", "H", "C1"). */
+    code: text("code"),
+    description: text("description"),
+    /**
+     * Semantic tone token for chips / pills. One of `muted | info | success |
+     * warning | danger | critical`. UI maps this to a Tailwind palette so
+     * customers don't have to know CSS classes.
+     */
+    tone: text("tone").notNull().default("muted"),
+    /** Optional numeric weight so dashboards can rank / compare levels. */
+    score: integer("score").notNull().default(0),
+    sortOrder: integer("sort_order").notNull().default(0),
+    isActive: boolean("is_active").notNull().default(true),
+    createdById: text("created_by_id").references(() => user.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  },
+  (t) => ({
+    orgIdx: index("risk_level_org_idx").on(t.organizationId),
+    orgNameIdx: uniqueIndex("risk_level_org_name_idx").on(
+      t.organizationId,
+      t.name,
+    ),
+  }),
+);
+
+/**
+ * Risk sectors — an industry / business-line classification used to tag
+ * company objects (branches / sites) with a baseline risk profile
+ * (e.g. Construction, Oil & Gas, Healthcare). Each sector points at a
+ * user-defined `risk_level` so the baseline is fully customisable.
  */
 export const riskSector = pgTable(
   "risk_sector",
@@ -299,11 +340,13 @@ export const riskSector = pgTable(
     code: text("code"),
     description: text("description"),
     /**
-     * Baseline risk for companies in this sector. Reuses the shared
-     * `severityEnum` so UI can treat it identically to finding / risk
-     * severities.
+     * FK into the workspace's risk-level dictionary. Nullable so a sector
+     * can exist before any level is defined — the UI shows an "unrated"
+     * chip in that case.
      */
-    defaultRisk: severityEnum("default_risk").notNull().default("MEDIUM"),
+    riskLevelId: text("risk_level_id").references(() => riskLevel.id, {
+      onDelete: "set null",
+    }),
     /** Optional accent colour for chips / pills (e.g. "amber", "rose"). */
     color: text("color"),
     sortOrder: integer("sort_order").notNull().default(0),
@@ -318,6 +361,7 @@ export const riskSector = pgTable(
       t.organizationId,
       t.name,
     ),
+    levelIdx: index("risk_sector_level_idx").on(t.riskLevelId),
   }),
 );
 
@@ -330,14 +374,6 @@ export const company = pgTable(
       .references(() => organization.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
     code: text("code"),
-    /**
-     * Optional FK into `risk_sector` so every company can be tagged with its
-     * industry / risk profile. NULL means "unclassified" — the UI shows a
-     * subdued badge in that case.
-     */
-    riskSectorId: text("risk_sector_id").references(() => riskSector.id, {
-      onDelete: "set null",
-    }),
     contactName: text("contact_name"),
     contactEmail: text("contact_email"),
     contactPhone: text("contact_phone"),
@@ -351,7 +387,6 @@ export const company = pgTable(
   (t) => ({
     orgIdx: index("company_org_idx").on(t.organizationId),
     orgNameIdx: uniqueIndex("company_org_name_idx").on(t.organizationId, t.name),
-    riskSectorIdx: index("company_risk_sector_idx").on(t.riskSectorId),
   }),
 );
 
@@ -369,6 +404,15 @@ export const companyObject = pgTable(
     code: text("code"),
     /** Free-form label e.g. "Branch", "Franchise", "Warehouse", "Office". */
     type: text("type"),
+    /**
+     * Risk sector for THIS specific branch / site. Sites of the same
+     * company can have very different risk profiles (e.g. an office vs.
+     * a refinery), so the FK lives on the object, not the company. NULL
+     * means "unclassified".
+     */
+    riskSectorId: text("risk_sector_id").references(() => riskSector.id, {
+      onDelete: "set null",
+    }),
     address: text("address"),
     city: text("city"),
     country: text("country"),
@@ -384,6 +428,7 @@ export const companyObject = pgTable(
   (t) => ({
     orgIdx: index("company_object_org_idx").on(t.organizationId),
     companyIdx: index("company_object_company_idx").on(t.companyId),
+    riskSectorIdx: index("company_object_risk_sector_idx").on(t.riskSectorId),
   }),
 );
 

@@ -6,8 +6,8 @@ import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
 import { can } from "@/lib/rbac/permissions";
 import { getT } from "@/lib/i18n";
-import type { RiskLevel } from "@/lib/validators/risk-sectors";
 import { listRiskSectors } from "./actions";
+import { listActiveRiskLevelOptions } from "../risk-levels/actions";
 import { SectorDialog } from "./sector-dialog";
 import { SectorRowActions } from "./row-actions";
 import { RiskLevelBadge } from "./sector-badge";
@@ -24,13 +24,15 @@ export default async function RiskSectorsPage({
   const { t } = await getT();
   const canManage = can(m.role, "riskSectors:manage");
 
-  const sectors = await listRiskSectors(params.orgSlug);
+  const [sectors, levelOptions] = await Promise.all([
+    listRiskSectors(params.orgSlug),
+    listActiveRiskLevelOptions(params.orgSlug),
+  ]);
 
-  // KPI totals for the page header strip.
   const totals = {
     total: sectors.length,
     active: sectors.filter((s) => s.isActive).length,
-    companies: sectors.reduce((sum, s) => sum + s.companyCount, 0),
+    objects: sectors.reduce((sum, s) => sum + s.objectCount, 0),
   };
 
   return (
@@ -38,7 +40,11 @@ export default async function RiskSectorsPage({
       <PageHeader
         title={t("modules.riskSectors.title")}
         description={t("modules.riskSectors.description")}
-        actions={canManage ? <SectorDialog orgSlug={params.orgSlug} /> : null}
+        actions={
+          canManage ? (
+            <SectorDialog orgSlug={params.orgSlug} levels={levelOptions} />
+          ) : null
+        }
       />
 
       {/* Summary chips — lightweight, just three totals */}
@@ -55,8 +61,8 @@ export default async function RiskSectorsPage({
           icon={<ShieldAlert className="h-4 w-4" />}
         />
         <SummaryCard
-          label={t("modules.riskSectors.taggedCompaniesLabel")}
-          value={totals.companies}
+          label={t("modules.riskSectors.taggedObjectsLabel")}
+          value={totals.objects}
           tone="primary"
           icon={<Building2 className="h-4 w-4" />}
         />
@@ -67,7 +73,11 @@ export default async function RiskSectorsPage({
           icon={<ShieldAlert className="h-5 w-5" />}
           title={t("modules.riskSectors.emptyTitle")}
           description={t("modules.riskSectors.emptyDescription")}
-          action={canManage ? <SectorDialog orgSlug={params.orgSlug} /> : null}
+          action={
+            canManage ? (
+              <SectorDialog orgSlug={params.orgSlug} levels={levelOptions} />
+            ) : null
+          }
         />
       ) : (
         <Card className="overflow-hidden">
@@ -88,10 +98,16 @@ export default async function RiskSectorsPage({
                         {s.code}
                       </span>
                     )}
-                    <RiskLevelBadge
-                      level={s.defaultRisk as RiskLevel}
-                      label={t(`modules.riskSectors.risk.${s.defaultRisk}`)}
-                    />
+                    {s.riskLevelId && s.levelName ? (
+                      <RiskLevelBadge
+                        tone={s.levelTone}
+                        label={s.levelName}
+                      />
+                    ) : (
+                      <Badge variant="secondary">
+                        {t("modules.riskSectors.unrated")}
+                      </Badge>
+                    )}
                     {!s.isActive && (
                       <Badge variant="secondary">{t("common.inactive")}</Badge>
                     )}
@@ -103,10 +119,10 @@ export default async function RiskSectorsPage({
                   )}
                   <p className="mt-0.5 flex items-center gap-1.5 text-xs text-muted-foreground">
                     <Building2 className="h-3 w-3" />
-                    {s.companyCount === 1
-                      ? t("modules.riskSectors.companyCountOne")
-                      : t("modules.riskSectors.companyCountMany", {
-                          count: s.companyCount,
+                    {s.objectCount === 1
+                      ? t("modules.riskSectors.objectCountOne")
+                      : t("modules.riskSectors.objectCountMany", {
+                          count: s.objectCount,
                         })}
                   </p>
                 </div>
@@ -118,12 +134,13 @@ export default async function RiskSectorsPage({
                       name: s.name,
                       code: s.code,
                       description: s.description,
-                      defaultRisk: s.defaultRisk as RiskLevel,
+                      riskLevelId: s.riskLevelId,
                       color: s.color,
                       sortOrder: s.sortOrder,
                       isActive: s.isActive,
-                      companyCount: s.companyCount,
+                      objectCount: s.objectCount,
                     }}
+                    levels={levelOptions}
                   />
                 )}
               </li>

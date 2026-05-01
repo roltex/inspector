@@ -4,6 +4,7 @@ import {
   AlertTriangle,
   ShieldAlert,
   ShieldHalf,
+  Gauge,
   ListTodo,
   Eye,
   GraduationCap,
@@ -62,6 +63,7 @@ export function buildNav(orgSlug: string): NavGroup[] {
       items: [
         { labelKey: "nav.companies", href: `${base}/companies`, icon: Building2 },
         { labelKey: "nav.riskSectors", href: `${base}/risk-sectors`, icon: ShieldHalf },
+        { labelKey: "nav.riskLevels", href: `${base}/risk-levels`, icon: Gauge },
         { labelKey: "nav.inspectionItems", href: `${base}/inspection-items`, icon: ListChecks },
       ],
     },

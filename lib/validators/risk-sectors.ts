@@ -1,13 +1,5 @@
 import { z } from "zod";
 
-/**
- * The four canonical severity levels reused from the DB's `severity` enum.
- * Keep this aligned with `severityEnum` in `lib/db/schema.ts` so Zod and the
- * database stay in sync.
- */
-export const RISK_LEVELS = ["LOW", "MEDIUM", "HIGH", "CRITICAL"] as const;
-export type RiskLevel = (typeof RISK_LEVELS)[number];
-
 export const riskSectorCreateSchema = z.object({
   name: z.string().trim().min(2).max(120),
   code: z
@@ -20,7 +12,11 @@ export const riskSectorCreateSchema = z.object({
     .optional()
     .nullable(),
   description: z.string().max(500).optional().nullable(),
-  defaultRisk: z.enum(RISK_LEVELS).default("MEDIUM"),
+  /**
+   * FK into the workspace's risk-level dictionary. Pass `null` to leave
+   * the sector unrated; callers validate it belongs to the same workspace.
+   */
+  riskLevelId: z.string().min(1).optional().nullable(),
   /**
    * Accent colour token (e.g. "amber", "rose"). Kept loose — the UI treats
    * unknown values as the neutral chip, so typos are harmless.

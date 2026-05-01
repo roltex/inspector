@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, Plus } from "lucide-react";
@@ -25,27 +26,39 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useT } from "@/components/i18n-provider";
-import { RISK_LEVELS, type RiskLevel } from "@/lib/validators/risk-sectors";
 import { createRiskSector, updateRiskSector } from "./actions";
+import { RiskLevelBadge } from "./sector-badge";
+
+const LEVEL_UNRATED = "__unrated__";
 
 interface SectorFormValues {
   id?: string;
   name: string;
   code: string | null;
   description: string | null;
-  defaultRisk: RiskLevel;
+  riskLevelId: string | null;
   color: string | null;
   sortOrder: number;
   isActive: boolean;
 }
 
+export interface LevelOption {
+  id: string;
+  name: string;
+  code: string | null;
+  tone: string;
+  score: number;
+}
+
 export function SectorDialog({
   orgSlug,
   initial,
+  levels,
   trigger,
 }: {
   orgSlug: string;
   initial?: SectorFormValues;
+  levels: LevelOption[];
   trigger?: React.ReactNode;
 }) {
   const t = useT();
@@ -54,7 +67,9 @@ export function SectorDialog({
   const [pending, start] = useTransition();
   const isEdit = Boolean(initial?.id);
 
-  const [risk, setRisk] = useState<RiskLevel>(initial?.defaultRisk ?? "MEDIUM");
+  const [levelId, setLevelId] = useState<string>(
+    initial?.riskLevelId ?? LEVEL_UNRATED,
+  );
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -63,7 +78,7 @@ export function SectorDialog({
       name: String(fd.get("name") ?? ""),
       code: String(fd.get("code") ?? "") || null,
       description: String(fd.get("description") ?? "") || null,
-      defaultRisk: risk,
+      riskLevelId: levelId && levelId !== LEVEL_UNRATED ? levelId : null,
       color: String(fd.get("color") ?? "") || null,
       sortOrder: Number(fd.get("sortOrder") ?? 0),
       isActive: fd.get("isActive") === "on",
@@ -137,21 +152,45 @@ export function SectorDialog({
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="defaultRisk">
-              {t("modules.riskSectors.defaultRisk")}
+            <Label htmlFor="riskLevelId">
+              {t("modules.riskSectors.baselineRisk")}
             </Label>
-            <Select value={risk} onValueChange={(v) => setRisk(v as RiskLevel)}>
-              <SelectTrigger id="defaultRisk">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {RISK_LEVELS.map((lvl) => (
-                  <SelectItem key={lvl} value={lvl}>
-                    {t(`modules.riskSectors.risk.${lvl}`)}
+            {levels.length === 0 ? (
+              <div className="rounded-lg border border-dashed px-3 py-2 text-sm text-muted-foreground">
+                {t("modules.riskSectors.noLevelsYet")}{" "}
+                <Link
+                  href={`/${orgSlug}/risk-levels`}
+                  className="text-primary underline-offset-4 hover:underline"
+                >
+                  {t("modules.riskSectors.openLevels")}
+                </Link>
+              </div>
+            ) : (
+              <Select value={levelId} onValueChange={setLevelId}>
+                <SelectTrigger id="riskLevelId">
+                  <SelectValue
+                    placeholder={t("modules.riskSectors.pickLevel")}
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={LEVEL_UNRATED}>
+                    {t("modules.riskSectors.unrated")}
                   </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+                  {levels.map((lv) => (
+                    <SelectItem key={lv.id} value={lv.id}>
+                      <span className="inline-flex items-center gap-2">
+                        <RiskLevelBadge tone={lv.tone} label={lv.name} />
+                        {lv.code ? (
+                          <span className="text-[11px] text-muted-foreground">
+                            · {lv.code}
+                          </span>
+                        ) : null}
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
 
           <div className="space-y-1.5">

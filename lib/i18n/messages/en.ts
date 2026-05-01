@@ -77,6 +77,7 @@ export const enMessages = {
     directory: "Directory",
     companies: "Companies",
     riskSectors: "Risk sectors",
+    riskLevels: "Risk levels",
     inspectionItems: "Inspection items",
   },
 
@@ -667,39 +668,76 @@ export const enMessages = {
     riskSectors: {
       title: "Risk sectors",
       description:
-        "Industry and business-line classifications you tag each company with. The baseline risk on a sector colour-codes the directory and pre-fills risk assessments, so companies in higher-risk industries get the attention they deserve.",
+        "Industry and business-line classifications you tag each company object (branch / site) with. Each sector carries a baseline risk level from your own dictionary, so higher-risk sites get the attention they deserve.",
       emptyTitle: "No risk sectors yet",
       emptyDescription:
-        "Add your first sector — e.g. Construction, Oil & Gas, Healthcare — so every company can carry a risk profile.",
+        "Add your first sector — e.g. Construction, Oil & Gas, Healthcare — so every site can carry a risk profile.",
       new: "New sector",
       edit: "Edit sector",
       formHint:
-        "Name the sector (e.g. Construction), give it an optional short code and a baseline risk level. You can reclassify companies any time.",
+        "Name the sector (e.g. Construction), give it an optional short code and pick a baseline risk level. You can reclassify objects any time.",
       name: "Name",
       namePlaceholder: "Construction",
       code: "Code",
       descriptionField: "Description",
       active: "Active",
-      defaultRisk: "Baseline risk",
+      baselineRisk: "Baseline risk",
+      pickLevel: "Pick a risk level…",
+      unrated: "Unrated",
+      noLevelsYet: "No risk levels defined yet.",
+      openLevels: "Open Risk levels",
       created: "Sector added.",
       updated: "Sector updated.",
       deleted: "Sector removed.",
       deleteConfirm: "Remove this risk sector?",
-      deleteWithCompaniesConfirm:
-        "This sector is assigned to {{count}} companies. Removing it will leave those companies unclassified. Continue?",
+      deleteWithObjectsConfirm:
+        "This sector is assigned to {{count}} company objects. Removing it will leave them unclassified. Continue?",
       // Page summary chips
       totalLabel: "Total sectors",
       activeLabel: "Active",
-      taggedCompaniesLabel: "Companies tagged",
-      companyCountOne: "1 company",
-      companyCountMany: "{{count}} companies",
-      // Risk-level labels — kept separate from `modules.findings.severity`
-      // so the Directory can use its own phrasing if needed later.
-      risk: {
-        LOW: "Low",
-        MEDIUM: "Medium",
-        HIGH: "High",
-        CRITICAL: "Critical",
+      taggedObjectsLabel: "Objects tagged",
+      objectCountOne: "1 object",
+      objectCountMany: "{{count}} objects",
+    },
+    riskLevels: {
+      title: "Risk levels",
+      description:
+        "Your workspace's own dictionary of baseline risk labels (e.g. Low / Medium / High / Critical — or anything that fits your operations). Risk sectors pick a level from this list, so every chip and ranking in the app speaks your language.",
+      emptyTitle: "No risk levels yet",
+      emptyDescription:
+        "Create at least one level — Low, Medium, High, Critical is a good starting point — then return to Risk sectors to pick one.",
+      new: "New level",
+      edit: "Edit level",
+      formHint:
+        "Pick a name, an accent tone and an optional numeric score. Higher scores rank more severe in dashboards.",
+      name: "Name",
+      namePlaceholder: "Critical",
+      code: "Code",
+      tone: "Accent tone",
+      score: "Score",
+      sortOrder: "Sort order",
+      active: "Active",
+      descriptionField: "Description",
+      preview: "Preview",
+      scoreInline: "score {{score}}",
+      created: "Risk level added.",
+      updated: "Risk level updated.",
+      deleted: "Risk level removed.",
+      deleteConfirm: "Remove this risk level?",
+      deleteWithSectorsConfirm:
+        "This level is used by {{count}} sectors. Removing it will leave those sectors unrated. Continue?",
+      totalLabel: "Total levels",
+      activeLabel: "Active",
+      usedByLabel: "Sectors using",
+      sectorCountOne: "Used by 1 sector",
+      sectorCountMany: "Used by {{count}} sectors",
+      tones: {
+        muted: "Muted",
+        info: "Info",
+        success: "Success",
+        warning: "Warning",
+        danger: "Danger",
+        critical: "Critical",
       },
     },
     inspectionItems: {

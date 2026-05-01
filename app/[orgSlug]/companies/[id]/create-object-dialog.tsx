@@ -16,19 +16,41 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useT } from "@/components/i18n-provider";
 import { createCompanyObject } from "../actions";
+import { RiskLevelBadge } from "../../risk-sectors/sector-badge";
+
+const SECTOR_UNCLASSIFIED = "__unclassified__";
+
+export interface SectorOption {
+  id: string;
+  name: string;
+  code: string | null;
+  color: string | null;
+  levelTone: string | null;
+  levelName: string | null;
+}
 
 export function CreateObjectDialog({
   orgSlug,
   companyId,
+  sectors = [],
 }: {
   orgSlug: string;
   companyId: string;
+  sectors?: SectorOption[];
 }) {
   const t = useT();
   const [open, setOpen] = useState(false);
   const [pending, start] = useTransition();
+  const [riskSectorId, setRiskSectorId] = useState<string>(SECTOR_UNCLASSIFIED);
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -40,6 +62,10 @@ export function CreateObjectDialog({
           name: String(fd.get("name") ?? ""),
           code: String(fd.get("code") ?? ""),
           type: String(fd.get("type") ?? ""),
+          riskSectorId:
+            riskSectorId && riskSectorId !== SECTOR_UNCLASSIFIED
+              ? riskSectorId
+              : null,
           address: String(fd.get("address") ?? ""),
           city: String(fd.get("city") ?? ""),
           country: String(fd.get("country") ?? ""),
@@ -50,6 +76,7 @@ export function CreateObjectDialog({
         });
         toast.success(t("modules.companies.objectCreated"));
         setOpen(false);
+        setRiskSectorId(SECTOR_UNCLASSIFIED);
         (e.target as HTMLFormElement).reset();
       } catch (err) {
         if (err instanceof Error && err.message.includes("NEXT_REDIRECT")) return;
@@ -75,7 +102,50 @@ export function CreateObjectDialog({
             <Field id="name" label={t("modules.companies.objectName")} required minLength={2} />
             <Field id="type" label={t("modules.companies.objectType")} placeholder={t("modules.companies.objectTypePlaceholder")} hint={t("common.optional")} />
           </div>
-          <Field id="code" label={t("modules.companies.code")} hint={t("common.optional")} />
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Field id="code" label={t("modules.companies.code")} hint={t("common.optional")} />
+            <div className="space-y-1.5">
+              <Label htmlFor="riskSectorId">
+                {t("modules.companies.riskSector")}
+                <span className="ml-1 text-xs font-normal text-muted-foreground">
+                  ({t("common.optional")})
+                </span>
+              </Label>
+              <Select
+                value={riskSectorId}
+                onValueChange={setRiskSectorId}
+                disabled={sectors.length === 0}
+              >
+                <SelectTrigger id="riskSectorId">
+                  <SelectValue
+                    placeholder={
+                      sectors.length === 0
+                        ? t("modules.companies.noSectorsYet")
+                        : t("modules.companies.selectSector")
+                    }
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={SECTOR_UNCLASSIFIED}>
+                    {t("modules.companies.unclassified")}
+                  </SelectItem>
+                  {sectors.map((s) => (
+                    <SelectItem key={s.id} value={s.id}>
+                      <span className="inline-flex items-center gap-2">
+                        <span className="font-medium">{s.name}</span>
+                        {s.levelName && (
+                          <RiskLevelBadge
+                            tone={s.levelTone}
+                            label={s.levelName}
+                          />
+                        )}
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
           <Field id="address" label={t("modules.companies.address")} hint={t("common.optional")} />
           <div className="grid gap-3 sm:grid-cols-2">
             <Field id="city" label={t("modules.companies.city")} hint={t("common.optional")} />

@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { and, asc, eq, sql } from "drizzle-orm";
 import { requirePermission, requireMembership } from "@/lib/auth/session";
 import { db } from "@/lib/db/client";
-import { company, riskSector } from "@/lib/db/schema";
+import { companyObject, riskLevel, riskSector } from "@/lib/db/schema";
 import { createId } from "@/lib/db/ids";
 import {
   riskSectorCreateSchema,
@@ -29,29 +29,57 @@ async function getOwnedSector(orgId: string, id: string) {
   return row;
 }
 
+/** Ensure the `risk_level` belongs to the same workspace — defends
+ *  against a client tampering with the hidden select id. */
+async function assertOwnedLevel(orgId: string, id: string | null | undefined) {
+  if (!id) return;
+  const [row] = await db
+    .select({ id: riskLevel.id })
+    .from(riskLevel)
+    .where(and(eq(riskLevel.id, id), eq(riskLevel.organizationId, orgId)))
+    .limit(1);
+  if (!row) throw new Error("Risk level not found in this workspace");
+}
+
 /* -------------------------------------------------------------------------- */
 /*  Reads                                                                     */
 /* -------------------------------------------------------------------------- */
 
-/** List every sector in the caller's workspace, with the number of companies
- *  currently tagged with it so the directory UI can show usage counts. */
+/** List every sector in the caller's workspace, joined to its risk level
+ *  and with the number of company objects currently tagged. */
 export async function listRiskSectors(orgSlug: string) {
   const m = await requireMembership(orgSlug);
 
   const [sectors, counts] = await Promise.all([
     db
-      .select()
+      .select({
+        id: riskSector.id,
+        name: riskSector.name,
+        code: riskSector.code,
+        description: riskSector.description,
+        riskLevelId: riskSector.riskLevelId,
+        color: riskSector.color,
+        sortOrder: riskSector.sortOrder,
+        isActive: riskSector.isActive,
+        createdAt: riskSector.createdAt,
+        updatedAt: riskSector.updatedAt,
+        levelName: riskLevel.name,
+        levelTone: riskLevel.tone,
+        levelCode: riskLevel.code,
+        levelScore: riskLevel.score,
+      })
       .from(riskSector)
+      .leftJoin(riskLevel, eq(riskLevel.id, riskSector.riskLevelId))
       .where(eq(riskSector.organizationId, m.organization.id))
       .orderBy(asc(riskSector.sortOrder), asc(riskSector.name)),
     db
       .select({
-        riskSectorId: company.riskSectorId,
+        riskSectorId: companyObject.riskSectorId,
         c: sql<number>`count(*)::int`,
       })
-      .from(company)
-      .where(eq(company.organizationId, m.organization.id))
-      .groupBy(company.riskSectorId),
+      .from(companyObject)
+      .where(eq(companyObject.organizationId, m.organization.id))
+      .groupBy(companyObject.riskSectorId),
   ]);
 
   const usage = new Map<string, number>();
@@ -59,10 +87,10 @@ export async function listRiskSectors(orgSlug: string) {
     if (r.riskSectorId) usage.set(r.riskSectorId, Number(r.c));
   }
 
-  return sectors.map((s) => ({ ...s, companyCount: usage.get(s.id) ?? 0 }));
+  return sectors.map((s) => ({ ...s, objectCount: usage.get(s.id) ?? 0 }));
 }
 
-/** Thin option-list used by selects on the company form. */
+/** Option list used by the object create / edit dialog. */
 export async function listActiveRiskSectorOptions(orgSlug: string) {
   const m = await requireMembership(orgSlug);
   return db
@@ -70,10 +98,12 @@ export async function listActiveRiskSectorOptions(orgSlug: string) {
       id: riskSector.id,
       name: riskSector.name,
       code: riskSector.code,
-      defaultRisk: riskSector.defaultRisk,
       color: riskSector.color,
+      levelTone: riskLevel.tone,
+      levelName: riskLevel.name,
     })
     .from(riskSector)
+    .leftJoin(riskLevel, eq(riskLevel.id, riskSector.riskLevelId))
     .where(
       and(
         eq(riskSector.organizationId, m.organization.id),
@@ -91,7 +121,6 @@ export async function createRiskSector(orgSlug: string, input: unknown) {
   const m = await requirePermission(orgSlug, "riskSectors:manage");
   const data = riskSectorCreateSchema.parse(input);
 
-  // Friendly duplicate-name guard (we also have a unique index as a backstop).
   const [existing] = await db
     .select({ id: riskSector.id })
     .from(riskSector)
@@ -106,6 +135,8 @@ export async function createRiskSector(orgSlug: string, input: unknown) {
     throw new Error("A sector with this name already exists in this workspace.");
   }
 
+  await assertOwnedLevel(m.organization.id, data.riskLevelId ?? null);
+
   const id = createId("rsec");
   await db.insert(riskSector).values({
     id,
@@ -113,7 +144,7 @@ export async function createRiskSector(orgSlug: string, input: unknown) {
     name: data.name,
     code: data.code ?? null,
     description: data.description ?? null,
-    defaultRisk: data.defaultRisk,
+    riskLevelId: data.riskLevelId ?? null,
     color: data.color ?? null,
     sortOrder: data.sortOrder ?? 0,
     isActive: data.isActive ?? true,
@@ -134,11 +165,15 @@ export async function updateRiskSector(
   const data = riskSectorUpdateSchema.parse(input);
   await getOwnedSector(m.organization.id, id);
 
+  if (data.riskLevelId !== undefined) {
+    await assertOwnedLevel(m.organization.id, data.riskLevelId ?? null);
+  }
+
   const patch: Record<string, unknown> = { updatedAt: new Date() };
   if (data.name !== undefined) patch.name = data.name;
   if (data.code !== undefined) patch.code = data.code ?? null;
   if (data.description !== undefined) patch.description = data.description ?? null;
-  if (data.defaultRisk !== undefined) patch.defaultRisk = data.defaultRisk;
+  if (data.riskLevelId !== undefined) patch.riskLevelId = data.riskLevelId ?? null;
   if (data.color !== undefined) patch.color = data.color ?? null;
   if (data.sortOrder !== undefined) patch.sortOrder = data.sortOrder;
   if (data.isActive !== undefined) patch.isActive = data.isActive;
@@ -161,9 +196,8 @@ export async function deleteRiskSector(orgSlug: string, id: string) {
   const m = await requirePermission(orgSlug, "riskSectors:manage");
   await getOwnedSector(m.organization.id, id);
 
-  // The FK is ON DELETE SET NULL, so companies currently tagged with this
-  // sector are preserved but become "unclassified". We still surface the
-  // impact to the caller as a friendly warning via the row-count.
+  // FK is ON DELETE SET NULL on company_object.risk_sector_id, so objects
+  // that were tagged become "unclassified".
   await db
     .delete(riskSector)
     .where(

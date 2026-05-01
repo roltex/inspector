@@ -37,17 +37,12 @@ async function assertOwnedRiskSector(orgId: string, id: string | null | undefine
 export async function createCompany(orgSlug: string, input: unknown) {
   const m = await requirePermission(orgSlug, "companies:manage");
   const data = companyCreateSchema.parse(input);
-  const riskSectorId = await assertOwnedRiskSector(
-    m.organization.id,
-    data.riskSectorId,
-  );
   const id = createId("co");
   await db.insert(company).values({
     id,
     organizationId: m.organization.id,
     name: data.name,
     code: data.code,
-    riskSectorId,
     contactName: data.contactName,
     contactEmail: data.contactEmail,
     contactPhone: data.contactPhone,
@@ -63,8 +58,6 @@ export async function createCompany(orgSlug: string, input: unknown) {
 export async function updateCompany(orgSlug: string, id: string, input: unknown) {
   const m = await requirePermission(orgSlug, "companies:manage");
   const data = companyUpdateSchema.parse(input);
-  // Resolve the sector id before building the patch so invalid values fail
-  // loudly before we touch the DB.
   const patch: Record<string, unknown> = { updatedAt: new Date() };
   for (const k of [
     "name",
@@ -78,12 +71,6 @@ export async function updateCompany(orgSlug: string, id: string, input: unknown)
   ] as const) {
     const v = (data as Record<string, unknown>)[k];
     if (v !== undefined) patch[k] = v;
-  }
-  if (data.riskSectorId !== undefined) {
-    patch.riskSectorId = await assertOwnedRiskSector(
-      m.organization.id,
-      data.riskSectorId,
-    );
   }
 
   await db
@@ -119,6 +106,11 @@ export async function createCompanyObject(orgSlug: string, input: unknown) {
     .limit(1);
   if (!parent) throw new Error("Company not found in workspace");
 
+  const riskSectorId = await assertOwnedRiskSector(
+    m.organization.id,
+    data.riskSectorId,
+  );
+
   const id = createId("obj");
   await db.insert(companyObject).values({
     id,
@@ -127,6 +119,7 @@ export async function createCompanyObject(orgSlug: string, input: unknown) {
     name: data.name,
     code: data.code,
     type: data.type,
+    riskSectorId,
     address: data.address,
     city: data.city,
     country: data.country,
@@ -143,9 +136,35 @@ export async function createCompanyObject(orgSlug: string, input: unknown) {
 export async function updateCompanyObject(orgSlug: string, id: string, input: unknown) {
   const m = await requirePermission(orgSlug, "companies:manage");
   const data = companyObjectUpdateSchema.parse(input);
+
+  const patch: Record<string, unknown> = { updatedAt: new Date() };
+  for (const k of [
+    "companyId",
+    "name",
+    "code",
+    "type",
+    "address",
+    "city",
+    "country",
+    "managerName",
+    "managerEmail",
+    "managerPhone",
+    "notes",
+    "isActive",
+  ] as const) {
+    const v = (data as Record<string, unknown>)[k];
+    if (v !== undefined) patch[k] = v;
+  }
+  if (data.riskSectorId !== undefined) {
+    patch.riskSectorId = await assertOwnedRiskSector(
+      m.organization.id,
+      data.riskSectorId,
+    );
+  }
+
   await db
     .update(companyObject)
-    .set({ ...data, updatedAt: new Date() })
+    .set(patch)
     .where(and(eq(companyObject.id, id), eq(companyObject.organizationId, m.organization.id)));
   revalidatePath(`/${orgSlug}/companies`);
 }

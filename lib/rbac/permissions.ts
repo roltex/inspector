@@ -59,6 +59,7 @@ export type Permission =
   | "companies:manage"
   | "inspectionItems:manage"
   | "riskSectors:manage"
+  | "riskLevels:manage"
   | "analytics:view"
   | "audit:view";
 
@@ -73,7 +74,7 @@ export const PERMISSIONS: Record<Role, Set<Permission>> = {
     "observations:create", "training:manage", "documents:manage", "documents:ack",
     "chemicals:manage", "ppe:manage", "permits:request", "permits:approve",
     "compliance:manage", "contractors:manage",
-    "companies:manage", "inspectionItems:manage", "riskSectors:manage",
+    "companies:manage", "inspectionItems:manage", "riskSectors:manage", "riskLevels:manage",
     "analytics:view", "audit:view",
   ]),
   ADMIN: P([
@@ -84,7 +85,7 @@ export const PERMISSIONS: Record<Role, Set<Permission>> = {
     "observations:create", "training:manage", "documents:manage", "documents:ack",
     "chemicals:manage", "ppe:manage", "permits:request", "permits:approve",
     "compliance:manage", "contractors:manage",
-    "companies:manage", "inspectionItems:manage", "riskSectors:manage",
+    "companies:manage", "inspectionItems:manage", "riskSectors:manage", "riskLevels:manage",
     "analytics:view", "audit:view",
   ]),
   EHS_MANAGER: P([
@@ -94,7 +95,7 @@ export const PERMISSIONS: Record<Role, Set<Permission>> = {
     "observations:create", "training:manage", "documents:manage",
     "chemicals:manage", "ppe:manage", "permits:approve",
     "compliance:manage", "contractors:manage",
-    "companies:manage", "inspectionItems:manage", "riskSectors:manage",
+    "companies:manage", "inspectionItems:manage", "riskSectors:manage", "riskLevels:manage",
     "analytics:view",
   ]),
   SUPERVISOR: P([

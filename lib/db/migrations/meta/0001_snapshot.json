@@ -1,5 +1,5 @@
 {
-  "id": "5f584f34-7191-43ce-b7e7-af24047fe44e",
+  "id": "22a87979-72c1-4a25-8807-28985578585c",
   "prevId": "446d80ff-089a-4f6e-b9df-8c1569a6cc6c",
   "version": "7",
   "dialect": "postgresql",
@@ -758,12 +758,6 @@
           "primaryKey": false,
           "notNull": false
         },
-        "risk_sector_id": {
-          "name": "risk_sector_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
         "contact_name": {
           "name": "contact_name",
           "type": "text",
@@ -858,21 +852,6 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
-        },
-        "company_risk_sector_idx": {
-          "name": "company_risk_sector_idx",
-          "columns": [
-            {
-              "expression": "risk_sector_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
         }
       },
       "foreignKeys": {
@@ -887,19 +866,6 @@
             "id"
           ],
           "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "company_risk_sector_id_risk_sector_id_fk": {
-          "name": "company_risk_sector_id_risk_sector_id_fk",
-          "tableFrom": "company",
-          "tableTo": "risk_sector",
-          "columnsFrom": [
-            "risk_sector_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "set null",
           "onUpdate": "no action"
         },
         "company_created_by_id_user_id_fk": {
@@ -958,6 +924,12 @@
         },
         "type": {
           "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "risk_sector_id": {
+          "name": "risk_sector_id",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -1062,6 +1034,21 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
+        },
+        "company_object_risk_sector_idx": {
+          "name": "company_object_risk_sector_idx",
+          "columns": [
+            {
+              "expression": "risk_sector_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
         }
       },
       "foreignKeys": {
@@ -1089,6 +1076,19 @@
             "id"
           ],
           "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "company_object_risk_sector_id_risk_sector_id_fk": {
+          "name": "company_object_risk_sector_id_risk_sector_id_fk",
+          "tableFrom": "company_object",
+          "tableTo": "risk_sector",
+          "columnsFrom": [
+            "risk_sector_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
           "onUpdate": "no action"
         },
         "company_object_created_by_id_user_id_fk": {
@@ -4603,6 +4603,161 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.risk_level": {
+      "name": "risk_level",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "code": {
+          "name": "code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "tone": {
+          "name": "tone",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'muted'"
+        },
+        "score": {
+          "name": "score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "sort_order": {
+          "name": "sort_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "created_by_id": {
+          "name": "created_by_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "risk_level_org_idx": {
+          "name": "risk_level_org_idx",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "risk_level_org_name_idx": {
+          "name": "risk_level_org_name_idx",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "name",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "risk_level_organization_id_organization_id_fk": {
+          "name": "risk_level_organization_id_organization_id_fk",
+          "tableFrom": "risk_level",
+          "tableTo": "organization",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "risk_level_created_by_id_user_id_fk": {
+          "name": "risk_level_created_by_id_user_id_fk",
+          "tableFrom": "risk_level",
+          "tableTo": "user",
+          "columnsFrom": [
+            "created_by_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.risk_sector": {
       "name": "risk_sector",
       "schema": "",
@@ -4637,13 +4792,11 @@
           "primaryKey": false,
           "notNull": false
         },
-        "default_risk": {
-          "name": "default_risk",
-          "type": "severity",
-          "typeSchema": "public",
+        "risk_level_id": {
+          "name": "risk_level_id",
+          "type": "text",
           "primaryKey": false,
-          "notNull": true,
-          "default": "'MEDIUM'"
+          "notNull": false
         },
         "color": {
           "name": "color",
@@ -4722,6 +4875,21 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
+        },
+        "risk_sector_level_idx": {
+          "name": "risk_sector_level_idx",
+          "columns": [
+            {
+              "expression": "risk_level_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
         }
       },
       "foreignKeys": {
@@ -4736,6 +4904,19 @@
             "id"
           ],
           "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "risk_sector_risk_level_id_risk_level_id_fk": {
+          "name": "risk_sector_risk_level_id_risk_level_id_fk",
+          "tableFrom": "risk_sector",
+          "tableTo": "risk_level",
+          "columnsFrom": [
+            "risk_level_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
           "onUpdate": "no action"
         },
         "risk_sector_created_by_id_user_id_fk": {

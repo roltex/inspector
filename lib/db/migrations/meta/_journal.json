@@ -12,8 +12,8 @@
     {
       "idx": 1,
       "version": "7",
-      "when": 1777630422587,
-      "tag": "0001_add_risk_sector",
+      "when": 1777634276495,
+      "tag": "0001_add_risk_directory",
       "breakpoints": true
     }
   ]

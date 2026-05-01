@@ -4,15 +4,15 @@ import { and, asc, eq } from "drizzle-orm";
 import { ArrowLeft, Building2, MapPin, Mail, Phone } from "lucide-react";
 import { requireMembership } from "@/lib/auth/session";
 import { db } from "@/lib/db/client";
-import { company, companyObject, riskSector } from "@/lib/db/schema";
+import { company, companyObject, riskLevel, riskSector } from "@/lib/db/schema";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page-header";
 import { can } from "@/lib/rbac/permissions";
 import { getT } from "@/lib/i18n";
-import type { RiskLevel } from "@/lib/validators/risk-sectors";
 import { RiskLevelBadge } from "../../risk-sectors/sector-badge";
+import { listActiveRiskSectorOptions } from "../../risk-sectors/actions";
 import { CreateObjectDialog } from "./create-object-dialog";
 import { CompanyDangerZone } from "./company-danger-zone";
 
@@ -27,31 +27,44 @@ export default async function CompanyDetailPage({
   const { t } = await getT();
   const canManage = can(m.role, "companies:manage");
 
-  const [joined] = await db
-    .select({
-      company,
-      sectorId: riskSector.id,
-      sectorName: riskSector.name,
-      sectorCode: riskSector.code,
-      sectorRisk: riskSector.defaultRisk,
-    })
+  const [row] = await db
+    .select()
     .from(company)
-    .leftJoin(riskSector, eq(riskSector.id, company.riskSectorId))
     .where(and(eq(company.id, params.id), eq(company.organizationId, m.organization.id)))
     .limit(1);
-  if (!joined) notFound();
-  const row = joined.company;
+  if (!row) notFound();
 
-  const objects = await db
-    .select()
-    .from(companyObject)
-    .where(
-      and(
-        eq(companyObject.companyId, row.id),
-        eq(companyObject.organizationId, m.organization.id),
-      ),
-    )
-    .orderBy(asc(companyObject.name));
+  const [objects, sectorOptions] = await Promise.all([
+    db
+      .select({
+        id: companyObject.id,
+        name: companyObject.name,
+        type: companyObject.type,
+        address: companyObject.address,
+        city: companyObject.city,
+        country: companyObject.country,
+        managerName: companyObject.managerName,
+        managerEmail: companyObject.managerEmail,
+        managerPhone: companyObject.managerPhone,
+        isActive: companyObject.isActive,
+        riskSectorId: companyObject.riskSectorId,
+        sectorName: riskSector.name,
+        sectorCode: riskSector.code,
+        levelName: riskLevel.name,
+        levelTone: riskLevel.tone,
+      })
+      .from(companyObject)
+      .leftJoin(riskSector, eq(riskSector.id, companyObject.riskSectorId))
+      .leftJoin(riskLevel, eq(riskLevel.id, riskSector.riskLevelId))
+      .where(
+        and(
+          eq(companyObject.companyId, row.id),
+          eq(companyObject.organizationId, m.organization.id),
+        ),
+      )
+      .orderBy(asc(companyObject.name)),
+    listActiveRiskSectorOptions(params.orgSlug),
+  ]);
 
   return (
     <div className="space-y-6">
@@ -66,15 +79,13 @@ export default async function CompanyDetailPage({
         description={row.code ? `${t("modules.companies.code")}: ${row.code}` : undefined}
         actions={
           <div className="flex flex-wrap items-center gap-2">
-            {joined.sectorId && joined.sectorRisk && (
-              <RiskLevelBadge
-                level={joined.sectorRisk as RiskLevel}
-                label={joined.sectorName ?? "—"}
-              />
-            )}
             {!row.isActive && <Badge variant="secondary">{t("common.inactive")}</Badge>}
             {canManage && (
-              <CreateObjectDialog orgSlug={params.orgSlug} companyId={row.id} />
+              <CreateObjectDialog
+                orgSlug={params.orgSlug}
+                companyId={row.id}
+                sectors={sectorOptions}
+              />
             )}
           </div>
         }
@@ -128,6 +139,18 @@ export default async function CompanyDetailPage({
                       <div className="flex flex-wrap items-center gap-2">
                         <p className="truncate font-medium">{o.name}</p>
                         {o.type && <Badge variant="secondary">{o.type}</Badge>}
+                        {o.riskSectorId && o.sectorName && (
+                          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2 py-0.5 text-[11px] text-primary">
+                            {o.sectorName}
+                            {o.levelName && (
+                              <RiskLevelBadge
+                                tone={o.levelTone}
+                                label={o.levelName}
+                                className="-my-1"
+                              />
+                            )}
+                          </span>
+                        )}
                         {!o.isActive && <Badge variant="secondary">{t("common.inactive")}</Badge>}
                       </div>
                       {(o.address || o.city) && (
