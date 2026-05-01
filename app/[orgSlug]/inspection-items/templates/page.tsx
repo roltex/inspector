@@ -13,7 +13,7 @@ import { can } from "@/lib/rbac/permissions";
 import { getT } from "@/lib/i18n";
 import { WorkspaceTemplateRowActions } from "./row-actions";
 
-export const metadata = { title: "Inspection item templates" };
+export const metadata = { title: "Inspection form templates" };
 export const dynamic = "force-dynamic";
 
 export default async function InspectionItemTemplatesPage({

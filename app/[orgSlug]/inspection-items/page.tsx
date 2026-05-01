@@ -16,7 +16,7 @@ import { ItemRowActions } from "./item-row-actions";
 import { CategoryManagerDialog, type CategoryRow } from "./category-manager";
 import { TemplatePickerDialog } from "./template-picker-dialog";
 
-export const metadata = { title: "Inspection items" };
+export const metadata = { title: "Inspection forms" };
 export const dynamic = "force-dynamic";
 
 export default async function InspectionItemsPage({

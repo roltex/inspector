@@ -78,7 +78,7 @@ export const enMessages = {
     companies: "Companies",
     riskSectors: "Risk sectors",
     riskLevels: "Risk levels",
-    inspectionItems: "Inspection items",
+    inspectionItems: "Inspection forms",
   },
 
   landing: {
@@ -442,10 +442,10 @@ export const enMessages = {
       selectCategory: "Select all in category",
       selectRest: "Select rest",
       deselectCategory: "Deselect all",
-      noItemsTitle: "No inspection items yet",
+      noItemsTitle: "No inspection forms yet",
       noItemsHint:
-        "Add items to your workspace catalog so you can pick them when planning an inspection.",
-      manageItems: "Manage items",
+        "Add forms to your workspace catalog so you can pick them when planning an inspection.",
+      manageItems: "Manage forms",
       noCompaniesTitle: "Add a company first",
       noCompaniesDescription:
         "Inspections are linked to a company and one of its objects. Create your first company to get started.",
@@ -741,15 +741,15 @@ export const enMessages = {
       },
     },
     inspectionItems: {
-      title: "Inspection items",
+      title: "Inspection forms",
       description:
-        "The catalog of items your inspectors can pick from when planning an inspection. Group items by category (e.g. Fire safety, Electrical, PPE).",
-      emptyTitle: "No items yet",
+        "The catalog of forms your inspectors can pick from when planning an inspection. Group forms by category (e.g. Fire safety, Electrical, PPE).",
+      emptyTitle: "No forms yet",
       emptyDescription:
         "Build your workspace catalog so inspectors can quickly select what to check.",
-      new: "New item",
-      edit: "Edit item",
-      formHint: "Items are grouped by category and shown as checkboxes when planning an inspection.",
+      new: "New form",
+      edit: "Edit form",
+      formHint: "Forms are grouped by category and shown as checkboxes when planning an inspection.",
       name: "Name",
       namePlaceholder: "Fire extinguisher present and accessible",
       category: "Category",
@@ -757,15 +757,15 @@ export const enMessages = {
       descriptionField: "Description",
       sortOrder: "Sort order",
       active: "Active",
-      created: "Item added.",
-      updated: "Item updated.",
-      deleted: "Item deleted.",
-      deleteConfirm: "Delete this inspection item?",
+      created: "Form added.",
+      updated: "Form updated.",
+      deleted: "Form deleted.",
+      deleteConfirm: "Delete this inspection form?",
       // Categories (related list)
       manageCategories: "Manage categories",
       categoriesTitle: "Inspection categories",
       categoriesDescription:
-        "Categories group your inspection items (e.g. Fire safety, Electrical, PPE). Items always belong to one category.",
+        "Categories group your inspection forms (e.g. Fire safety, Electrical, PPE). Forms always belong to one category.",
       noCategoriesYet: "No categories yet — add your first one below.",
       noCategoriesHint: "Add a category to get started",
       addCategory: "Add category",
@@ -778,7 +778,7 @@ export const enMessages = {
       categoryDeleted: "Category deleted.",
       categoryDeleteConfirm: "Delete this category?",
       categoryHasItems:
-        "This category still has items. Reassign or remove them first.",
+        "This category still has forms. Reassign or remove them first.",
       selectCategory: "Choose a category…",
       selectCategoryError: "Please select a category.",
       // Form-builder per item (the findings form schema)
@@ -847,12 +847,12 @@ export const enMessages = {
       presetCellNotSupported: "Not supported in presets",
     },
     inspectionItemTemplates: {
-      title: "Inspection-item templates",
+      title: "Inspection form templates",
       description:
-        "Save a fully-defined inspection item — its fields, sub-fields and preset rows — as a reusable template. Apply it later to spin up a new item in seconds.",
+        "Save a fully-defined inspection form — its fields, sub-fields and preset rows — as a reusable template. Apply it later to spin up a new form in seconds.",
       manageTemplates: "Templates",
-      backToItems: "Back to items",
-      // Item row action
+      backToItems: "Back to forms",
+      // Form row action
       saveAsTemplate: "Save as template",
       savePrompt: "Name this template:",
       savePromptDefault: "{{name}} (template)",
@@ -865,7 +865,7 @@ export const enMessages = {
         "Pick a template — global ones are managed by the platform admin, workspace ones are yours.",
       searchPlaceholder: "Search templates…",
       apply: "Apply template",
-      appliedToast: "Template applied — new item created.",
+      appliedToast: "Template applied — new form created.",
       noMatches: "No templates match your search.",
       emptyTitle: "No templates available yet.",
       // Template list page
@@ -873,7 +873,7 @@ export const enMessages = {
       sectionGlobal: "Provided by the platform",
       workspaceEmptyTitle: "No workspace templates yet",
       workspaceEmptyDescription:
-        'Save any inspection item as a template using the "Save as template" button on the items list.',
+        'Save any inspection form as a template using the "Save as template" button on the forms list.',
       globalEmptyDescription:
         "There are no platform-wide templates available right now.",
       scopeGlobal: "Global",
@@ -884,17 +884,17 @@ export const enMessages = {
       fields: "fields",
       row: "row",
       // Workspace row actions
-      applyToWorkspace: "Create item from this template",
+      applyToWorkspace: "Create form from this template",
       activate: "Activate",
       deactivate: "Deactivate",
       activated: "Template activated.",
       deactivated: "Template deactivated.",
       deleteConfirm:
-        "Delete this workspace template? Items already created from it stay untouched.",
+        "Delete this workspace template? Forms already created from it stay untouched.",
       deleted: "Template deleted.",
       updated: "Template updated.",
       edit: "Edit template",
-      editHint: "These changes only affect future applies — existing items are not touched.",
+      editHint: "These changes only affect future applies — existing forms are not touched.",
     },
     members: {
       title: "Members",
@@ -937,21 +937,21 @@ export const enMessages = {
       users: "Users",
       billing: "Billing",
       plans: "Plans",
-      inspectionItemTemplates: "Item templates",
+      inspectionItemTemplates: "Form templates",
       auditLog: "Audit log",
       settings: "Settings",
       health: "Health",
     },
     inspectionItemTemplates: {
-      title: "Inspection-item templates",
+      title: "Inspection form templates",
       description:
-        "Author the inspection items that every workspace should have access to. Mark templates as auto-seed and any new tenant will get a copy on sign-up.",
+        "Author the inspection forms that every workspace should have access to. Mark templates as auto-seed and any new tenant will get a copy on sign-up.",
       new: "New template",
       newTitle: "Create global template",
       newDescription:
         "Build a template from scratch or promote one of your tenants' workspace templates to global.",
       editDescription:
-        "Edit metadata and the field schema. Existing items derived from this template are NOT updated retroactively.",
+        "Edit metadata and the field schema. Existing forms derived from this template are NOT updated retroactively.",
       created: "Global template created.",
       promoted: "Template promoted to global.",
       promoteAction: "Promote to global",
@@ -967,7 +967,7 @@ export const enMessages = {
       categoryPlaceholder: "Fire safety",
       autoSeedLabelLong: "Auto-seed for new workspaces",
       autoSeedHint:
-        "When ON, every new tenant signing up will start with a copy of this template in their item catalogue.",
+        "When ON, every new tenant signing up will start with a copy of this template in their form catalogue.",
       autoSeedEnabled: "Auto-seed enabled.",
       autoSeedDisabled: "Auto-seed disabled.",
       enableAutoSeed: "Enable auto-seed",
@@ -976,7 +976,7 @@ export const enMessages = {
         "Inactive templates are hidden from workspace pickers and won't be used by auto-seed.",
       fieldsJsonLabel: "Field schema (JSON)",
       fieldsJsonHint:
-        "Each entry mirrors a single inspection-item field (key, label, type, options, sub-fields, preset rows, etc). Leave as [] if you'd like to author the schema in a workspace and promote it later.",
+        "Each entry mirrors a single inspection-form field (key, label, type, options, sub-fields, preset rows, etc). Leave as [] if you'd like to author the schema in a workspace and promote it later.",
       fieldsJsonMustBeArray: "Schema must be a JSON array.",
       totalLabel: "Total templates",
       autoSeedLabel: "Auto-seed",
